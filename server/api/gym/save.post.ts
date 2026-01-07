@@ -6,21 +6,34 @@ export default defineEventHandler(async (event) => {
     const sheets = await getGoogleSheetsClient();
     const spreadsheetId = await getSpreadsheetId();
 
-    // Prepare data rows
-    const rows: any[][] = [
-      [
+    console.log("Saving workout to sheet:", spreadsheetId);
+    console.log("Data:", body);
+
+    // Get existing data to check if we need header
+    const existing = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "GYM!A1:J1",
+    });
+
+    const rows: any[][] = [];
+
+    // Add header if sheet is empty
+    if (!existing.data.values || existing.data.values.length === 0) {
+      rows.push([
         "Week",
         "Day",
         "Date",
+        "Time",
         "Exercise",
         "Set 1",
         "Set 2",
         "Set 3",
         "Set 4",
         "Completed",
-      ],
-    ];
+      ]);
+    }
 
+    // Add workout data
     body.exercises.forEach((exercise) => {
       const setData = exercise.sets.map((s) => `${s.weight}kg × ${s.reps}`);
       while (setData.length < 4) setData.push("-");
@@ -29,16 +42,17 @@ export default defineEventHandler(async (event) => {
         body.week,
         body.day,
         body.date,
+        body.time || "-",
         exercise.name,
         ...setData,
-        body.completed ? "Yes" : "No",
+        body.completed ? "YES" : "NO",
       ]);
     });
 
     // Append data
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: "GYM!A:I",
+      range: "GYM!A:J",
       valueInputOption: "RAW",
       requestBody: { values: rows },
     });
@@ -57,14 +71,17 @@ export default defineEventHandler(async (event) => {
       "GYM",
       startRow,
       rows.length,
-      9,
+      10,
     );
+
+    console.log("Workout saved successfully");
 
     return { success: true, message: "Workout saved successfully" };
   } catch (error: any) {
+    console.error("Failed to save workout:", error);
     throw createError({
       statusCode: 500,
-      message: error.message,
+      message: `Failed to save: ${error.message}`,
     });
   }
 });

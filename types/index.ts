@@ -12,6 +12,7 @@ export interface WorkoutDay {
   week: number;
   day: string;
   date: string;
+  time?: string; // NEW
   exercises: Exercise[];
   completed: boolean;
 }
@@ -19,6 +20,7 @@ export interface WorkoutDay {
 export interface BulkEntry {
   week: number;
   date: string;
+  time?: string; // NEW
   weight: number;
   notes?: string;
 }

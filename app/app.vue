@@ -1,48 +1,50 @@
 <template>
     <div class="min-h-screen">
         <nav
-            class="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-50"
+            class="border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-sm sticky top-0 z-50"
         >
-            <div class="container mx-auto px-4">
+            <div class="container mx-auto px-6">
                 <div class="flex items-center justify-between h-16">
                     <NuxtLink to="/" class="flex items-center space-x-3">
                         <div
-                            class="w-10 h-10 bg-gradient-to-br from-japan-red to-red-700 rounded-lg flex items-center justify-center"
+                            class="w-8 h-8 border-2 border-white flex items-center justify-center"
                         >
-                            <span class="text-white font-bold text-xl">V</span>
+                            <span class="text-white font-bold text-sm">V</span>
                         </div>
                         <span
-                            class="text-xl font-bold bg-gradient-to-r from-japan-red to-red-400 bg-clip-text text-transparent"
+                            class="text-sm font-bold text-white uppercase tracking-widest"
                         >
-                            V-SHAPE TRACKER
+                            V-SHAPE
                         </span>
                     </NuxtLink>
 
-                    <div class="flex space-x-6">
+                    <div class="flex space-x-8">
                         <NuxtLink
                             to="/gym"
-                            class="text-gray-300 hover:text-japan-red transition-colors duration-200 font-medium"
+                            class="text-zinc-400 hover:text-white transition-colors duration-150 font-medium uppercase text-xs tracking-wider"
                         >
-                            Gym Progress
+                            GYM
                         </NuxtLink>
                         <NuxtLink
                             to="/bulk"
-                            class="text-gray-300 hover:text-japan-red transition-colors duration-200 font-medium"
+                            class="text-zinc-400 hover:text-white transition-colors duration-150 font-medium uppercase text-xs tracking-wider"
                         >
-                            Bulk Tracking
+                            BULK
                         </NuxtLink>
                     </div>
                 </div>
             </div>
         </nav>
 
-        <main class="container mx-auto px-4 py-8">
+        <main class="container mx-auto px-6 py-12">
             <NuxtPage />
         </main>
 
-        <footer class="border-t border-gray-800 mt-16 py-8">
-            <div class="container mx-auto px-4 text-center text-gray-500">
-                <p>Built with discipline. No excuses.</p>
+        <footer class="border-t border-zinc-800 mt-20 py-8">
+            <div
+                class="container mx-auto px-6 text-center text-zinc-600 text-xs uppercase tracking-wider"
+            >
+                <p>DISCIPLINE. NO EXCUSES.</p>
             </div>
         </footer>
     </div>

@@ -1,36 +1,40 @@
 <template>
     <div class="max-w-6xl mx-auto">
         <div class="mb-8">
-            <h1 class="text-4xl font-bold mb-2 text-japan-red">
-                Gym Progress Tracker
+            <h1
+                class="text-4xl font-bold mb-2 text-white uppercase tracking-tight"
+            >
+                GYM TRACKER
             </h1>
-            <p class="text-gray-400">
-                Track every set, chase numbers, build discipline.
+            <p class="text-zinc-500 font-mono text-sm">
+                TRACK EVERY SET / CHASE NUMBERS
             </p>
         </div>
 
         <!-- Week Selector -->
-        <div class="card-japanese mb-8">
+        <div class="card-clean mb-8">
             <div class="flex items-center justify-between">
                 <button
                     @click="currentWeek = Math.max(1, currentWeek - 1)"
                     :disabled="currentWeek === 1"
-                    class="px-4 py-2 bg-gray-800 rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    class="px-4 py-2 border border-zinc-700 hover:border-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm font-mono"
                 >
-                    ← Previous
+                    ← PREV
                 </button>
 
                 <div class="text-center">
-                    <div class="text-3xl font-bold">Week {{ currentWeek }}</div>
-                    <div class="text-gray-400 text-sm">/ 12 weeks</div>
+                    <div class="text-3xl font-bold font-mono text-white">
+                        WEEK {{ currentWeek }}
+                    </div>
+                    <div class="text-zinc-600 text-xs font-mono">/ 12</div>
                 </div>
 
                 <button
                     @click="currentWeek = Math.min(12, currentWeek + 1)"
                     :disabled="currentWeek === 12"
-                    class="px-4 py-2 bg-gray-800 rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    class="px-4 py-2 border border-zinc-700 hover:border-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm font-mono"
                 >
-                    Next →
+                    NEXT →
                 </button>
             </div>
         </div>
@@ -42,14 +46,18 @@
                 :key="day.value"
                 @click="selectedDay = day.value"
                 :class="[
-                    'p-4 rounded-lg border-2 transition-all',
+                    'p-4 border transition-all text-left',
                     selectedDay === day.value
-                        ? 'border-japan-red bg-japan-red/20'
-                        : 'border-gray-700 hover:border-gray-600',
+                        ? 'border-white bg-white text-black'
+                        : 'border-zinc-800 hover:border-zinc-600',
                 ]"
             >
-                <div class="font-bold">{{ day.label }}</div>
-                <div class="text-xs text-gray-400 mt-1">{{ day.focus }}</div>
+                <div class="font-bold text-sm uppercase tracking-wider">
+                    {{ day.label }}
+                </div>
+                <div class="text-xs mt-1 font-mono opacity-60">
+                    {{ day.focus }}
+                </div>
             </button>
         </div>
 
@@ -61,25 +69,28 @@
         />
 
         <!-- Progress History -->
-        <div class="card-japanese mt-8" v-if="workoutHistory.length > 0">
-            <h3 class="text-2xl font-bold mb-4 text-japan-red">
-                Recent Workouts
+        <div class="card-clean mt-8" v-if="workoutHistory.length > 0">
+            <h3
+                class="text-xl font-bold mb-4 text-white uppercase tracking-wider"
+            >
+                RECENT
             </h3>
             <div class="space-y-2">
                 <div
                     v-for="(workout, idx) in workoutHistory.slice(0, 5)"
                     :key="idx"
-                    class="bg-gray-800 p-3 rounded-lg flex justify-between items-center"
+                    class="border border-zinc-800 p-3 flex justify-between items-center hover:border-zinc-600 transition-colors"
                 >
-                    <div>
-                        <span class="font-bold">Week {{ workout[0] }}</span>
-                        <span class="text-gray-400 mx-2">•</span>
-                        <span>{{ workout[1] }}</span>
-                        <span class="text-gray-500 ml-2 text-sm">{{
-                            workout[2]
-                        }}</span>
+                    <div class="font-mono text-sm">
+                        <span class="text-white font-bold"
+                            >W{{ workout[0] }}</span
+                        >
+                        <span class="text-zinc-600 mx-2">/</span>
+                        <span class="text-zinc-400">{{ workout[1] }}</span>
                     </div>
-                    <span class="text-sm text-gray-500">{{ workout[3] }}</span>
+                    <div class="text-zinc-600 text-xs font-mono">
+                        {{ workout[2] }}
+                    </div>
                 </div>
             </div>
         </div>

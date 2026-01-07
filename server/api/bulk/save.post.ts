@@ -6,23 +6,32 @@ export default defineEventHandler(async (event) => {
     const sheets = await getGoogleSheetsClient();
     const spreadsheetId = await getSpreadsheetId();
 
+    console.log("Saving bulk entry to sheet:", spreadsheetId);
+    console.log("Data:", body);
+
     // Check if header exists
     const existing = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "BULK!A1:D1",
+      range: "BULK!A1:E1",
     });
 
     const rows: any[][] = [];
 
     if (!existing.data.values || existing.data.values.length === 0) {
-      rows.push(["Week", "Date", "Weight (kg)", "Notes"]);
+      rows.push(["Week", "Date", "Time", "Weight (kg)", "Notes"]);
     }
 
-    rows.push([body.week, body.date, body.weight, body.notes || ""]);
+    rows.push([
+      body.week,
+      body.date,
+      body.time || "-",
+      body.weight,
+      body.notes || "",
+    ]);
 
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: "BULK!A:D",
+      range: "BULK!A:E",
       valueInputOption: "RAW",
       requestBody: { values: rows },
     });
@@ -41,14 +50,17 @@ export default defineEventHandler(async (event) => {
       "BULK",
       startRow,
       totalRows,
-      4,
+      5,
     );
+
+    console.log("Bulk entry saved successfully");
 
     return { success: true, message: "Weight saved successfully" };
   } catch (error: any) {
+    console.error("Failed to save bulk entry:", error);
     throw createError({
       statusCode: 500,
-      message: error.message,
+      message: `Failed to save: ${error.message}`,
     });
   }
 });

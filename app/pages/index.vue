@@ -1,100 +1,146 @@
 <template>
     <div class="max-w-6xl mx-auto">
         <!-- Hero Section -->
-        <div class="text-center mb-16">
-            <h1
-                class="text-5xl font-bold mb-4 bg-gradient-to-r from-japan-red via-red-500 to-orange-500 bg-clip-text text-transparent"
-            >
-                V-SHAPE PROGRAM
-            </h1>
-            <p class="text-xl text-gray-400 mb-8">
-                12 Weeks. Zero Tolerance. Maximum Results.
-            </p>
-            <div class="flex justify-center space-x-4">
-                <NuxtLink to="/gym" class="button-primary">
-                    Start Gym Tracking
+        <div class="mb-20">
+            <div class="grid-accent border border-zinc-800 p-12 mb-8">
+                <h1
+                    class="text-6xl font-bold mb-4 text-white uppercase tracking-tight"
+                >
+                    V-SHAPE<br />PROGRAM
+                </h1>
+                <p class="text-lg text-zinc-400 mb-8 font-mono">
+                    12 WEEKS / ZERO TOLERANCE / MAXIMUM RESULTS
+                </p>
+            </div>
+
+            <div class="flex gap-4">
+                <NuxtLink to="/gym" class="button-clean flex-1 text-center">
+                    START TRACKING
                 </NuxtLink>
                 <NuxtLink
                     to="/bulk"
-                    class="button-primary bg-gray-700 hover:bg-gray-600 border-gray-700"
+                    class="button-secondary flex-1 text-center"
                 >
-                    Track Bulk Progress
+                    BULK LOG
                 </NuxtLink>
             </div>
         </div>
 
         <!-- Program Overview -->
         <div class="grid md:grid-cols-2 gap-6 mb-12">
-            <div class="card-japanese">
-                <h3 class="text-2xl font-bold mb-4 text-japan-red">
-                    Program Structure
+            <div class="card-clean">
+                <h3
+                    class="text-xl font-bold mb-6 text-white uppercase tracking-wider"
+                >
+                    STRUCTURE
                 </h3>
-                <ul class="space-y-3 text-gray-300">
-                    <li class="flex items-start">
-                        <span class="text-japan-red mr-2">•</span>
-                        <span
-                            ><strong>5 days/week</strong> - Senin to Sabtu,
-                            Kamis & Minggu rest</span
-                        >
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-japan-red mr-2">•</span>
-                        <span
-                            ><strong>Back 2x/week</strong> - Width (Senin) +
-                            Thickness (Jumat)</span
-                        >
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-japan-red mr-2">•</span>
-                        <span
-                            ><strong>Lateral Delts 3x/week</strong> - 12 sets
-                            total (V-taper key)</span
-                        >
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-japan-red mr-2">•</span>
-                        <span
-                            ><strong>Legs 1x/week</strong> - Non-negotiable, no
-                            futsal substitutes</span
-                        >
-                    </li>
-                </ul>
+                <div class="space-y-4 text-zinc-300 font-mono text-sm">
+                    <div class="border-l-2 border-zinc-700 pl-4">
+                        <div class="text-white font-bold">5 DAYS / WEEK</div>
+                        <div class="text-zinc-500">Mon–Sat, Rest Thu & Sun</div>
+                    </div>
+                    <div class="border-l-2 border-zinc-700 pl-4">
+                        <div class="text-white font-bold">BACK 2X</div>
+                        <div class="text-zinc-500">
+                            Width (Mon) + Thickness (Fri)
+                        </div>
+                    </div>
+                    <div class="border-l-2 border-zinc-700 pl-4">
+                        <div class="text-white font-bold">LATERAL DELTS 3X</div>
+                        <div class="text-zinc-500">
+                            12 sets total (V-taper key)
+                        </div>
+                    </div>
+                    <div class="border-l-2 border-zinc-700 pl-4">
+                        <div class="text-white font-bold">LEGS 1X</div>
+                        <div class="text-zinc-500">Non-negotiable</div>
+                    </div>
+                </div>
             </div>
 
-            <div class="card-japanese">
-                <h3 class="text-2xl font-bold mb-4 text-japan-red">
-                    Progression Rules
+            <div class="card-clean">
+                <h3
+                    class="text-xl font-bold mb-6 text-white uppercase tracking-wider"
+                >
+                    RULES
                 </h3>
-                <ul class="space-y-3 text-gray-300">
-                    <li class="flex items-start">
-                        <span class="text-japan-red mr-2">✓</span>
-                        <span
-                            ><strong>Double Progression:</strong> Reps first,
-                            then weight</span
-                        >
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-japan-red mr-2">✓</span>
-                        <span
-                            ><strong>Track Everything:</strong> Weight × reps,
-                            exact numbers</span
-                        >
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-japan-red mr-2">✓</span>
-                        <span
-                            ><strong>Stuck 2 weeks?</strong> Deload 10% and
-                            rebuild</span
-                        >
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-red-400 mr-2">✗</span>
-                        <span
-                            ><strong>No "kadang ga selesai"</strong> - adjust
-                            weight properly</span
-                        >
-                    </li>
-                </ul>
+                <div class="space-y-4 text-zinc-300 font-mono text-sm">
+                    <div class="border-l-2 border-white pl-4">
+                        <div class="text-white font-bold">
+                            DOUBLE PROGRESSION
+                        </div>
+                        <div class="text-zinc-500">Reps first, then weight</div>
+                    </div>
+                    <div class="border-l-2 border-white pl-4">
+                        <div class="text-white font-bold">TRACK EVERYTHING</div>
+                        <div class="text-zinc-500">
+                            Weight × reps, exact numbers
+                        </div>
+                    </div>
+                    <div class="border-l-2 border-white pl-4">
+                        <div class="text-white font-bold">STUCK 2 WEEKS?</div>
+                        <div class="text-zinc-500">Deload 10% and rebuild</div>
+                    </div>
+                    <div class="border-l-2 border-zinc-700 pl-4">
+                        <div class="text-zinc-500 font-bold">
+                            NO "KADANG GA SELESAI"
+                        </div>
+                        <div class="text-zinc-600">Adjust weight properly</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Schedule -->
+        <div class="card-clean">
+            <h3
+                class="text-xl font-bold mb-6 text-white uppercase tracking-wider"
+            >
+                SCHEDULE
+            </h3>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div
+                    class="border border-zinc-800 p-4 hover:border-white transition-colors"
+                >
+                    <div class="text-white font-bold text-sm mb-1">SENIN</div>
+                    <div class="text-zinc-500 text-xs font-mono">
+                        Back Width
+                    </div>
+                </div>
+                <div
+                    class="border border-zinc-800 p-4 hover:border-white transition-colors"
+                >
+                    <div class="text-white font-bold text-sm mb-1">SELASA</div>
+                    <div class="text-zinc-500 text-xs font-mono">Push</div>
+                </div>
+                <div
+                    class="border border-zinc-800 p-4 hover:border-white transition-colors"
+                >
+                    <div class="text-white font-bold text-sm mb-1">RABU</div>
+                    <div class="text-zinc-500 text-xs font-mono">Legs</div>
+                </div>
+                <div class="border border-zinc-700 p-4 opacity-50">
+                    <div class="text-zinc-600 font-bold text-sm mb-1">
+                        KAMIS
+                    </div>
+                    <div class="text-zinc-700 text-xs font-mono">Rest</div>
+                </div>
+                <div
+                    class="border border-zinc-800 p-4 hover:border-white transition-colors"
+                >
+                    <div class="text-white font-bold text-sm mb-1">JUMAT</div>
+                    <div class="text-zinc-500 text-xs font-mono">
+                        Back Thickness
+                    </div>
+                </div>
+                <div
+                    class="border border-zinc-800 p-4 hover:border-white transition-colors"
+                >
+                    <div class="text-white font-bold text-sm mb-1">SABTU</div>
+                    <div class="text-zinc-500 text-xs font-mono">
+                        Shoulders + Arms
+                    </div>
+                </div>
             </div>
         </div>
     </div>

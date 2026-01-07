@@ -1,19 +1,40 @@
 <template>
-    <div class="card-japanese">
-        <h3 class="text-2xl font-bold mb-6 text-japan-red">
-            {{ dayName }} - {{ dayFocus }}
-        </h3>
+    <div class="card-clean">
+        <div class="flex justify-between items-start mb-6">
+            <div>
+                <h3
+                    class="text-2xl font-bold text-white uppercase tracking-tight"
+                >
+                    {{ dayName }}
+                </h3>
+                <p class="text-zinc-500 text-sm font-mono mt-1">
+                    {{ dayFocus }}
+                </p>
+            </div>
+            <div v-if="lastSaved" class="text-right">
+                <div class="text-xs text-zinc-600 uppercase tracking-wider">
+                    Last Saved
+                </div>
+                <div class="text-sm text-zinc-400 font-mono">
+                    {{ lastSaved }}
+                </div>
+            </div>
+        </div>
 
         <form @submit.prevent="saveWorkout" class="space-y-6">
             <div
                 v-for="(exercise, exIdx) in exercises"
                 :key="exIdx"
-                class="bg-gray-800 rounded-lg p-4"
+                class="border border-zinc-800 p-4"
             >
                 <div class="flex items-center justify-between mb-3">
-                    <h4 class="font-bold text-lg">{{ exercise.name }}</h4>
-                    <span class="text-gray-400 text-sm"
-                        >{{ exercise.sets.length }} sets</span
+                    <h4
+                        class="font-bold text-sm uppercase tracking-wider text-white"
+                    >
+                        {{ exercise.name }}
+                    </h4>
+                    <span class="text-zinc-600 text-xs font-mono"
+                        >{{ exercise.sets.length }} SETS</span
                     >
                 </div>
 
@@ -21,25 +42,25 @@
                     <div
                         v-for="(set, setIdx) in exercise.sets"
                         :key="setIdx"
-                        class="flex items-center gap-3"
+                        class="grid grid-cols-[80px_1fr_20px_1fr] gap-3 items-center"
                     >
-                        <span class="text-gray-400 w-16"
-                            >Set {{ setIdx + 1 }}:</span
+                        <span class="text-zinc-600 text-xs font-mono uppercase"
+                            >SET {{ setIdx + 1 }}</span
                         >
                         <input
                             v-model.number="set.weight"
                             type="number"
                             step="0.5"
-                            placeholder="Weight"
-                            class="input-japanese flex-1"
+                            placeholder="KG"
+                            class="input-clean text-center"
                             required
                         />
-                        <span class="text-gray-400">×</span>
+                        <span class="text-zinc-600 text-center">×</span>
                         <input
                             v-model.number="set.reps"
                             type="number"
-                            placeholder="Reps"
-                            class="input-japanese flex-1"
+                            placeholder="REPS"
+                            class="input-clean text-center"
                             required
                         />
                     </div>
@@ -47,26 +68,36 @@
             </div>
 
             <div
-                class="flex items-center justify-between pt-4 border-t border-gray-800"
+                class="flex items-center justify-between pt-4 border-t border-zinc-800"
             >
-                <label class="flex items-center space-x-2 cursor-pointer">
+                <label class="flex items-center space-x-3 cursor-pointer group">
                     <input
                         v-model="completed"
                         type="checkbox"
-                        class="w-5 h-5 rounded border-gray-600 text-japan-red focus:ring-japan-red"
+                        class="w-5 h-5 border-2 border-zinc-700 bg-transparent checked:bg-white checked:border-white"
                     />
-                    <span>Mark as completed</span>
+                    <span
+                        class="text-sm uppercase tracking-wider text-zinc-400 group-hover:text-white transition-colors"
+                        >COMPLETED</span
+                    >
                 </label>
 
                 <button
                     type="submit"
                     :disabled="saving"
-                    class="button-primary disabled:opacity-50"
+                    class="button-clean disabled:opacity-50"
                 >
-                    {{ saving ? "Saving..." : "Save Workout" }}
+                    {{ saving ? "SAVING..." : "SAVE" }}
                 </button>
             </div>
         </form>
+
+        <div
+            v-if="saveError"
+            class="mt-4 border border-red-900 bg-red-950/20 p-3"
+        >
+            <div class="text-red-400 text-sm font-mono">{{ saveError }}</div>
+        </div>
     </div>
 </template>
 
@@ -83,6 +114,8 @@ const emit = defineEmits(["saved"]);
 const exercises = ref<Exercise[]>([]);
 const completed = ref(false);
 const saving = ref(false);
+const lastSaved = ref("");
+const saveError = ref("");
 
 const programTemplates: Record<
     string,
@@ -171,24 +204,35 @@ function initializeExercises() {
 
 async function saveWorkout() {
     saving.value = true;
+    saveError.value = "";
+
     try {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString("id-ID");
+        const timeStr = now.toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+
         await $fetch("/api/gym/save", {
             method: "POST",
             body: {
                 week: props.week,
                 day: dayName.value,
-                date: new Date().toLocaleDateString("id-ID"),
+                date: dateStr,
+                time: timeStr,
                 exercises: exercises.value,
                 completed: completed.value,
             },
         });
 
-        alert("Workout saved successfully!");
+        lastSaved.value = `${dateStr} ${timeStr}`;
         emit("saved");
         completed.value = false;
-    } catch (error) {
-        alert("Failed to save workout");
-        console.error(error);
+    } catch (error: any) {
+        saveError.value =
+            error.message || "Failed to save. Check console for details.";
+        console.error("Save error:", error);
     } finally {
         saving.value = false;
     }
