@@ -1,83 +1,117 @@
 <template>
-    <div class="card-clean">
-        <h3 class="text-2xl font-bold mb-6 text-white uppercase tracking-wider">
-            LOG WEIGHT
-        </h3>
-
-        <form @submit.prevent="saveWeight" class="space-y-4">
-            <div>
-                <label
-                    class="block text-xs font-bold mb-2 text-zinc-500 uppercase tracking-wider"
-                    >WEEK</label
-                >
-                <input
-                    v-model.number="week"
-                    type="number"
-                    min="1"
-                    max="12"
-                    class="input-clean w-full"
-                    required
-                />
-            </div>
-
-            <div>
-                <label
-                    class="block text-xs font-bold mb-2 text-zinc-500 uppercase tracking-wider"
-                    >WEIGHT (KG)</label
-                >
-                <input
-                    v-model.number="weight"
-                    type="number"
-                    step="0.1"
-                    class="input-clean w-full"
-                    required
-                />
-            </div>
-
-            <div>
-                <label
-                    class="block text-xs font-bold mb-2 text-zinc-500 uppercase tracking-wider"
-                    >NOTES</label
-                >
-                <textarea
-                    v-model="notes"
-                    class="input-clean w-full font-mono text-sm"
-                    rows="3"
-                    placeholder="Energy, sleep, appetite..."
-                />
-            </div>
-
-            <button
-                type="submit"
-                :disabled="saving"
-                class="button-clean w-full disabled:opacity-50"
+    <div
+        class="inner border-x border-separator bg-white min-h-[60vh] flex flex-col md:flex-row"
+    >
+        <div class="flex-1 p-8 md:p-16 flex flex-col justify-center">
+            <span
+                class="font-handwriting text-xl text-primary mb-4 block rotate-2 w-fit"
+                >Morning Check-in!</span
             >
-                {{ saving ? "SAVING..." : "SAVE ENTRY" }}
-            </button>
-        </form>
+            <h2
+                class="text-5xl font-black mb-12 uppercase text-foreground-primary"
+            >
+                Daily Weigh-In
+            </h2>
 
-        <div v-if="lastSaved" class="mt-4 border border-zinc-800 p-3">
-            <div class="text-xs text-zinc-600 uppercase tracking-wider">
-                Last Saved
-            </div>
-            <div class="text-sm text-zinc-400 font-mono mt-1">
-                {{ lastSaved }}
-            </div>
+            <form @submit.prevent="saveWeight" class="space-y-12 max-w-md">
+                <div class="group">
+                    <label
+                        class="block font-mono text-xs uppercase tracking-widest text-foreground-text mb-2 group-hover:text-primary transition-colors"
+                    >
+                        Current Weight
+                    </label>
+                    <div class="relative">
+                        <input
+                            v-model.number="weight"
+                            type="number"
+                            step="0.1"
+                            placeholder="00.0"
+                            class="input-pow text-6xl py-4"
+                            required
+                        />
+                        <span
+                            class="absolute right-0 bottom-4 text-2xl font-bold text-separator"
+                            >KG</span
+                        >
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="group">
+                        <label
+                            class="block font-mono text-xs uppercase tracking-widest text-foreground-text mb-2"
+                            >Week</label
+                        >
+                        <input
+                            v-model.number="week"
+                            type="number"
+                            placeholder="1"
+                            class="input-pow"
+                            required
+                        />
+                    </div>
+                    <div class="group">
+                        <label
+                            class="block font-mono text-xs uppercase tracking-widest text-foreground-text mb-2"
+                            >Note</label
+                        >
+                        <input
+                            v-model="notes"
+                            type="text"
+                            placeholder="Feeling..."
+                            class="input-pow"
+                        />
+                    </div>
+                </div>
+
+                <div class="pt-8">
+                    <button
+                        type="submit"
+                        :disabled="saving"
+                        class="w-full h-16 bg-foreground-primary text-white rounded-xl font-bold text-xl hover:bg-primary transition-all hover:scale-[1.02] flex justify-center items-center gap-3 disabled:opacity-70 disabled:hover:scale-100"
+                    >
+                        {{ saving ? "Saving..." : "Log Weight" }}
+                        <span v-if="!saving">→</span>
+                    </button>
+                </div>
+
+                <div
+                    v-if="saveError"
+                    class="text-red-500 font-bold text-center mt-4"
+                >
+                    {{ saveError }}
+                </div>
+            </form>
         </div>
 
         <div
-            v-if="saveError"
-            class="mt-4 border border-red-900 bg-red-950/20 p-3"
+            class="md:w-1/3 bg-[#fcfbf7] border-l border-separator p-8 flex flex-col justify-center relative overflow-hidden"
         >
-            <div class="text-red-400 text-sm font-mono">{{ saveError }}</div>
-        </div>
+            <div
+                class="absolute top-0 right-0 p-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"
+            ></div>
 
-        <div class="mt-6 border border-zinc-800 p-4">
-            <div class="flex items-start gap-3">
-                <span class="text-zinc-600 text-xl">⚠</span>
-                <div class="text-zinc-500 text-xs font-mono">
-                    <strong class="text-zinc-400">BULKING TIP:</strong> If
-                    weight stalls 2+ weeks, add 200-300 cal/day.
+            <div class="relative z-10">
+                <Notebook class="text-6xl text-primary mb-6" />
+                <h3 class="text-2xl font-bold mb-4 text-foreground-primary">
+                    Bulking Strategy
+                </h3>
+                <p
+                    class="font-mono text-sm leading-relaxed mb-8 text-foreground-text"
+                >
+                    If scale weight stalls for >2 weeks, increase daily intake
+                    by <strong>200-300 kcal</strong>. Focus on clean carbs
+                    pre/post workout.
+                </p>
+
+                <div v-if="lastSaved" class="border-t border-separator pt-8">
+                    <span
+                        class="font-handwriting text-foreground-text block mb-2"
+                        >Last Entry:</span
+                    >
+                    <div class="text-4xl font-black text-primary">
+                        {{ lastSaved }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -88,13 +122,14 @@
 const emit = defineEmits(["saved"]);
 
 const week = ref(1);
-const weight = ref(0);
+const weight = ref<number | null>(null);
 const notes = ref("");
 const saving = ref(false);
 const lastSaved = ref("");
 const saveError = ref("");
 
 async function saveWeight() {
+    if (!weight.value) return;
     saving.value = true;
     saveError.value = "";
 
@@ -117,13 +152,11 @@ async function saveWeight() {
             },
         });
 
-        lastSaved.value = `${dateStr} ${timeStr}`;
+        lastSaved.value = `${dateStr}`;
         emit("saved");
-        notes.value = "";
         week.value++;
     } catch (error: any) {
-        saveError.value = error.message || "Failed to save. Check console.";
-        console.error("Save error:", error);
+        saveError.value = error.message || "Failed to save.";
     } finally {
         saving.value = false;
     }

@@ -1,79 +1,60 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+@theme {
+    /* Fonts */
+    --font-sans: "Syne", sans-serif;
+    --font-handwriting: "Mynerve", cursive;
+    --font-mono: "Courier New", monospace;
+
+    /* Colors */
+    --color-background: #f8f6e3;
+    --color-background-2: #ffffff;
+    --color-foreground-primary: #4b352a;
+    --color-foreground-text: #52525b;
+    --color-border: #27272a;
+    --color-separator: #d4d4d8;
+    --color-primary: #229799;
+    --color-foreground-button: #ffffff;
+}
+
 @layer base {
     body {
-        @apply bg-zinc-950 text-gray-100 font-mono antialiased;
-        background-image:
-            linear-gradient(
-                to right,
-                rgba(255, 255, 255, 0.08) 1px,
-                transparent 1px
-            ),
-            linear-gradient(
-                to bottom,
-                rgba(255, 255, 255, 0.08) 1px,
-                transparent 1px
-            );
-        background-size: 32px 32px;
-        background-position: center center;
+        background-color: var(--color-background);
+        color: var(--color-foreground-text);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        color: var(--color-foreground-primary);
+        letter-spacing: -0.05em;
     }
 }
 
 @layer components {
-    .card-clean {
-        @apply bg-zinc-900 border border-zinc-800 rounded-none p-6;
-        @apply shadow-lg;
-        position: relative;
+    /* Layout Utilities */
+    .inner {
+        @apply mx-auto w-[90%] max-w-5xl;
     }
 
-    .card-clean::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 2px;
-        height: 100%;
-        background: linear-gradient(
-            to bottom,
-            rgba(255, 255, 255, 0.5),
-            transparent
-        );
+    .input-pow {
+        @apply w-full bg-transparent border-b-2 border-separator py-4 font-sans text-xl font-bold text-foreground-primary outline-none transition-colors;
+    }
+    .input-pow:focus {
+        @apply border-primary;
+    }
+    .input-pow::placeholder {
+        @apply text-separator font-normal;
     }
 
-    .button-clean {
-        @apply bg-white text-black px-6 py-3 rounded-none;
-        @apply transition-all duration-150 font-medium;
-        @apply border border-white hover:bg-zinc-900 hover:text-white;
-        @apply uppercase text-sm tracking-wider;
-    }
-
-    .button-secondary {
-        @apply bg-zinc-900 text-white px-6 py-3 rounded-none;
-        @apply border border-zinc-700 hover:border-white;
-        @apply transition-all duration-150 font-medium;
-        @apply uppercase text-sm tracking-wider;
-    }
-
-    .input-clean {
-        @apply bg-zinc-900 border border-zinc-700 rounded-none px-4 py-3;
-        @apply text-gray-100 placeholder-zinc-600;
-        @apply focus:border-white focus:outline-none;
-        @apply transition-all duration-150 font-mono;
-    }
-
-    .grid-accent {
-        background-image:
-            linear-gradient(
-                to right,
-                rgba(255, 255, 255, 0.12) 1px,
-                transparent 1px
-            ),
-            linear-gradient(
-                to bottom,
-                rgba(255, 255, 255, 0.12) 1px,
-                transparent 1px
-            );
-        background-size: 32px 32px;
+    /* Button Style */
+    .btn-pow {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl border border-border px-6 py-4 font-bold text-foreground-primary transition-all hover:bg-primary hover:text-white hover:border-primary cursor-pointer active:scale-95;
     }
 }

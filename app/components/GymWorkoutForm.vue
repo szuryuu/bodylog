@@ -1,103 +1,127 @@
 <template>
-    <div class="card-clean">
-        <div class="flex justify-between items-start mb-6">
+    <div class="inner border-x border-separator bg-white min-h-[60vh]">
+        <div
+            class="p-8 border-b border-separator flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+        >
             <div>
-                <h3
-                    class="text-2xl font-bold text-white uppercase tracking-tight"
+                <span class="font-handwriting text-primary text-xl"
+                    >Today's Session</span
                 >
+                <h2 class="text-4xl md:text-5xl font-black uppercase mt-1">
                     {{ dayName }}
-                </h3>
-                <p class="text-zinc-500 text-sm font-mono mt-1">
-                    {{ dayFocus }}
+                </h2>
+                <p class="font-mono text-sm mt-2 text-foreground-text">
+                    Focus: {{ dayFocus }}
                 </p>
             </div>
-            <div v-if="lastSaved" class="text-right">
-                <div class="text-xs text-zinc-600 uppercase tracking-wider">
-                    Last Saved
-                </div>
-                <div class="text-sm text-zinc-400 font-mono">
-                    {{ lastSaved }}
-                </div>
+
+            <div
+                v-if="lastSaved"
+                class="px-4 py-2 border border-separator rounded-full bg-background flex items-center gap-2"
+            >
+                <span
+                    class="w-2 h-2 bg-green-500 rounded-full animate-pulse"
+                ></span>
+                <span class="font-mono text-xs uppercase tracking-widest"
+                    >Saved: {{ lastSaved }}</span
+                >
             </div>
         </div>
 
-        <form @submit.prevent="saveWorkout" class="space-y-6">
+        <form @submit.prevent="saveWorkout" class="divide-y divide-separator">
             <div
                 v-for="(exercise, exIdx) in exercises"
                 :key="exIdx"
-                class="border border-zinc-800 p-4"
+                class="p-6 md:p-8 hover:bg-[#fcfbf7] transition-colors group"
             >
-                <div class="flex items-center justify-between mb-3">
+                <div class="flex justify-between items-baseline mb-6">
                     <h4
-                        class="font-bold text-sm uppercase tracking-wider text-white"
+                        class="text-2xl font-bold group-hover:text-primary transition-colors uppercase"
                     >
                         {{ exercise.name }}
                     </h4>
-                    <span class="text-zinc-600 text-xs font-mono"
-                        >{{ exercise.sets.length }} SETS</span
+                    <span
+                        class="font-mono text-xs border border-separator px-2 py-1 rounded bg-white"
                     >
+                        {{ exercise.sets.length }} SETS
+                    </span>
                 </div>
 
-                <div class="space-y-2">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div
                         v-for="(set, setIdx) in exercise.sets"
                         :key="setIdx"
-                        class="grid grid-cols-[80px_1fr_20px_1fr] gap-3 items-center"
+                        class="flex items-center gap-2"
                     >
-                        <span class="text-zinc-600 text-xs font-mono uppercase"
-                            >SET {{ setIdx + 1 }}</span
+                        <span class="font-mono text-xs text-primary w-6 pt-1"
+                            >S{{ setIdx + 1 }}</span
                         >
-                        <input
-                            v-model.number="set.weight"
-                            type="number"
-                            step="0.5"
-                            placeholder="KG"
-                            class="input-clean text-center"
-                            required
-                        />
-                        <span class="text-zinc-600 text-center">×</span>
-                        <input
-                            v-model.number="set.reps"
-                            type="number"
-                            placeholder="REPS"
-                            class="input-clean text-center"
-                            required
-                        />
+
+                        <div class="relative w-full">
+                            <input
+                                v-model.number="set.weight"
+                                type="number"
+                                step="0.5"
+                                placeholder="KG"
+                                class="w-full bg-transparent border-b border-separator py-1 font-bold text-center focus:outline-none focus:border-primary transition-colors"
+                            />
+                        </div>
+
+                        <span class="text-separator text-sm">×</span>
+
+                        <div class="relative w-full">
+                            <input
+                                v-model.number="set.reps"
+                                type="number"
+                                placeholder="REPS"
+                                class="w-full bg-transparent border-b border-separator py-1 font-bold text-center focus:outline-none focus:border-primary transition-colors"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div
-                class="flex items-center justify-between pt-4 border-t border-zinc-800"
-            >
-                <label class="flex items-center space-x-3 cursor-pointer group">
-                    <input
-                        v-model="completed"
-                        type="checkbox"
-                        class="w-5 h-5 border-2 border-zinc-700 bg-transparent checked:bg-white checked:border-white"
-                    />
-                    <span
-                        class="text-sm uppercase tracking-wider text-zinc-400 group-hover:text-white transition-colors"
-                        >COMPLETED</span
-                    >
-                </label>
-
-                <button
-                    type="submit"
-                    :disabled="saving"
-                    class="button-clean disabled:opacity-50"
+            <div class="p-8 bg-background">
+                <div
+                    class="flex flex-col md:flex-row items-center justify-between gap-6"
                 >
-                    {{ saving ? "SAVING..." : "SAVE" }}
-                </button>
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <input
+                            type="checkbox"
+                            v-model="completed"
+                            class="peer hidden"
+                        />
+                        <div
+                            class="w-6 h-6 border-2 border-border rounded flex items-center justify-center transition-colors peer-checked:bg-primary peer-checked:border-primary"
+                        >
+                            <span
+                                class="text-white text-sm opacity-0 peer-checked:opacity-100"
+                                >✓</span
+                            >
+                        </div>
+                        <span
+                            class="font-bold text-foreground-primary group-hover:text-primary transition-colors"
+                            >Session Completed</span
+                        >
+                    </label>
+
+                    <button
+                        type="submit"
+                        :disabled="saving"
+                        class="bg-primary text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-foreground-primary transition-colors flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                        {{ saving ? "Saving..." : "Save Workout" }}
+                    </button>
+                </div>
+
+                <div
+                    v-if="saveError"
+                    class="mt-4 text-red-500 font-bold text-center border border-red-200 bg-red-50 p-2 rounded"
+                >
+                    {{ saveError }}
+                </div>
             </div>
         </form>
-
-        <div
-            v-if="saveError"
-            class="mt-4 border border-red-900 bg-red-950/20 p-3"
-        >
-            <div class="text-red-400 text-sm font-mono">{{ saveError }}</div>
-        </div>
     </div>
 </template>
 
@@ -180,19 +204,24 @@ const programTemplates: Record<
     },
 };
 
-const dayName = computed(() => programTemplates[props.day]?.name || "");
-const dayFocus = computed(() => programTemplates[props.day]?.focus || "");
+const dayName = computed(() => programTemplates[props.day]?.name || "REST DAY");
+const dayFocus = computed(
+    () => programTemplates[props.day]?.focus || "Recover",
+);
 
 function initializeExercises() {
     const template = programTemplates[props.day];
-    if (!template) return;
-
+    if (!template) {
+        exercises.value = [];
+        return;
+    }
     exercises.value = template.exercises.map((name) => {
-        const numSets = name.includes("Lateral Raise")
-            ? 4
-            : name.includes("Leg") || name.includes("Pull-Up")
-              ? 4
-              : 3;
+        const numSets =
+            name.includes("Lateral Raise") ||
+            name.includes("Leg") ||
+            name.includes("Pull-Up")
+                ? 4
+                : 3;
         return {
             name,
             sets: Array(numSets)
@@ -205,7 +234,6 @@ function initializeExercises() {
 async function saveWorkout() {
     saving.value = true;
     saveError.value = "";
-
     try {
         const now = new Date();
         const dateStr = now.toLocaleDateString("id-ID");
@@ -230,19 +258,11 @@ async function saveWorkout() {
         emit("saved");
         completed.value = false;
     } catch (error: any) {
-        saveError.value =
-            error.message || "Failed to save. Check console for details.";
-        console.error("Save error:", error);
+        saveError.value = error.message || "Failed to save.";
     } finally {
         saving.value = false;
     }
 }
 
-watch(
-    () => props.day,
-    () => {
-        initializeExercises();
-    },
-    { immediate: true },
-);
+watch(() => props.day, initializeExercises, { immediate: true });
 </script>

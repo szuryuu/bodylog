@@ -6,15 +6,6 @@ export default defineNuxtConfig({
   css: ["./app/assets/css/main.css"],
   vite: { plugins: [tailwindcss()] },
 
-  runtimeConfig: {
-    googleServiceAccount: {
-      projectId: process.env.GOOGLE_PROJECT_ID,
-      privateKey: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-      clientEmail: process.env.GOOGLE_CLIENT_EMAIL,
-    },
-    spreadsheetId: process.env.SPREADSHEET_ID,
-  },
-
   app: {
     head: {
       title: "V-Shape Tracker",
@@ -26,7 +17,25 @@ export default defineNuxtConfig({
   },
 
   devtools: { enabled: true },
-  modules: ["@nuxt/ui"],
+  modules: ["@nuxt/ui", "@nuxtjs/google-fonts", "nuxt-lucide-icons"],
+
+  googleFonts: {
+    families: {
+      Syne: [400, 500, 600, 700, 800],
+      Mynerve: [400],
+      "Courier+New": [400, 700],
+    },
+    display: "swap",
+  },
+
+  runtimeConfig: {
+    googleServiceAccount: {
+      projectId: process.env.GOOGLE_PROJECT_ID,
+      privateKey: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      clientEmail: process.env.GOOGLE_CLIENT_EMAIL,
+    },
+    spreadsheetId: process.env.SPREADSHEET_ID,
+  },
 
   colorMode: {
     preference: "dark",
