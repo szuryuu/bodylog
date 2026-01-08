@@ -57,8 +57,12 @@
                             >
                             <span
                                 class="text-4xl text-foreground-primary group-hover:rotate-12 transition-transform"
-                                >🏋️</span
                             >
+                                <Dumbbell
+                                    class="w-12 h-12 text-primary rotate-[-15deg]"
+                                    :stroke-width="1.5"
+                                />
+                            </span>
                         </div>
                         <h3 class="text-3xl font-bold mb-6">Structure</h3>
                         <ul class="space-y-4 font-mono text-sm">
@@ -101,8 +105,10 @@
                             >
                             <span
                                 class="text-4xl text-foreground-primary group-hover:-rotate-12 transition-transform"
-                                >📏</span
-                            >
+                                ><Scale
+                                    class="w-12 h-12 text-primary"
+                                    :stroke-width="1.5"
+                            /></span>
                         </div>
                         <h3 class="text-3xl font-bold mb-6">Rules</h3>
                         <ul class="space-y-4 font-mono text-sm">
@@ -140,3 +146,7 @@
         </section>
     </div>
 </template>
+
+<script setup lang="ts">
+import { Dumbbell, Scale } from "lucide-vue-next";
+</script>

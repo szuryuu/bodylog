@@ -92,7 +92,7 @@
             ></div>
 
             <div class="relative z-10">
-                <Notebook class="text-6xl text-primary mb-6" />
+                <Notebook class="w-15 h-15 text-primary mb-6" />
                 <h3 class="text-2xl font-bold mb-4 text-foreground-primary">
                     Bulking Strategy
                 </h3>
@@ -119,6 +119,7 @@
 </template>
 
 <script setup lang="ts">
+import { Notebook } from "lucide-vue-next";
 const emit = defineEmits(["saved"]);
 
 const week = ref(1);
