@@ -36,7 +36,6 @@
                     v-for="d in days"
                     :key="d.value"
                     @click="selectDay(d.value)"
-                    :disabled="isDayCompleted(d.value)"
                     :class="[
                         'px-4 py-2 rounded-lg font-bold text-sm transition-all border border-separator font-mono uppercase tracking-wider relative',
                         selectedDay === d.value
@@ -114,37 +113,24 @@
         <div class="inner border-x border-separator bg-white">
             <div
                 v-if="isDayCompleted(selectedDay)"
-                class="p-6 bg-yellow-50 border-b border-yellow-200"
+                class="px-6 py-3 bg-green-50 border-b border-green-100 flex items-center justify-between"
             >
-                <div class="flex items-center gap-3">
-                    <span class="text-2xl">warn logo</span>
-                    <div>
-                        <p class="font-bold text-yellow-900">
-                            This session is already completed
-                        </p>
-                        <p class="text-sm text-yellow-700 font-mono">
-                            Week {{ currentWeek }} - {{ selectedDayName }} has
-                            been logged. Select another day or week.
-                        </p>
-                    </div>
+                <div class="flex items-center gap-2">
+                    <CheckCircle2 class="w-5 h-5 text-green-600" />
+                    <span class="text-sm font-bold text-green-800">
+                        Session marked as completed
+                    </span>
                 </div>
+                <span class="text-xs text-green-700 font-mono"
+                    >You can still edit below</span
+                >
             </div>
 
             <GymWorkoutForm
-                v-if="!isDayCompleted(selectedDay)"
                 :week="currentWeek"
                 :day="selectedDay"
                 @saved="handleSaved"
             />
-
-            <div
-                v-else
-                class="p-8 text-center border-b border-separator bg-background"
-            >
-                <p class="font-mono text-sm text-foreground-text opacity-60">
-                    Workout already logged. View it in Recent Logs below.
-                </p>
-            </div>
         </div>
 
         <div class="inner border-x bg-white border-t border-separator">
@@ -179,10 +165,7 @@
 
                     <div class="divide-y divide-separator">
                         <div
-                            v-for="(workout, idx) in workoutHistory.slice(
-                                0,
-                                10,
-                            )"
+                            v-for="(workout, idx) in workoutHistory.slice(0, 5)"
                             :key="idx"
                             class="grid grid-cols-12 gap-4 p-4 items-center hover:bg-[#fcfbf7] transition-colors group"
                         >
@@ -269,7 +252,7 @@ import {
     CheckCircle2,
 } from "lucide-vue-next";
 
-const PROGRAM_START_DATE = new Date("2025-12-30");
+const PROGRAM_START_DATE = new Date("2026-01-05");
 
 const currentWeek = ref(1);
 const selectedDay = ref("monday");
@@ -353,9 +336,7 @@ function isDayCompleted(day: string): boolean {
 }
 
 function selectDay(day: string) {
-    if (!isDayCompleted(day)) {
-        selectedDay.value = day;
-    }
+    selectedDay.value = day;
 }
 
 async function loadHistory() {
@@ -374,7 +355,9 @@ async function loadHistory() {
         sortedData.forEach((row) => {
             const week = row[0];
             const day = row[1];
-            if (week && day) {
+            const isCompleted = row[9] === "YES";
+
+            if (week && day && isCompleted) {
                 sessions.add(`${week}-${day}`);
             }
         });
@@ -436,9 +419,9 @@ function selectFirstIncompleteDay() {
 function handleSaved() {
     loadHistory();
 
-    setTimeout(() => {
-        selectFirstIncompleteDay();
-    }, 500);
+    // setTimeout(() => {
+    //     selectFirstIncompleteDay();
+    // }, 500);
 }
 
 watch(currentWeek, () => {

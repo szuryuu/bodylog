@@ -7,20 +7,19 @@ export default defineEventHandler(async (event) => {
     const spreadsheetId = await getSpreadsheetId();
 
     const sheetName = `GYM-${body.day}`;
+    console.log("Processing workout for:", sheetName);
 
-    console.log("Saving workout to sheet:", sheetName);
-    console.log("Data:", body);
-
-    const existing = await sheets.spreadsheets.values.get({
+    const existingResponse = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A1:I1`,
+      range: `${sheetName}!A:J`,
     });
 
-    const rows: any[][] = [];
+    let rows = existingResponse.data.values || [];
 
-    if (!existing.data.values || existing.data.values.length === 0) {
+    if (rows.length === 0) {
       rows.push([
         "Week",
+        "Day",
         "Date",
         "Time",
         "Exercise",
@@ -32,49 +31,52 @@ export default defineEventHandler(async (event) => {
       ]);
     }
 
-    // Add workout data
     body.exercises.forEach((exercise) => {
-      const setData = exercise.sets.map((s) => `${s.weight}kg × ${s.reps}`);
+      const setData = exercise.sets.map((s) =>
+        s.weight > 0 || s.reps > 0 ? `${s.weight}kg × ${s.reps}` : "-",
+      );
       while (setData.length < 4) setData.push("-");
 
-      rows.push([
-        body.week,
+      const newRow = [
+        body.week.toString(),
+        body.day,
         body.date,
         body.time || "-",
         exercise.name,
         ...setData,
         body.completed ? "YES" : "NO",
-      ]);
+      ];
+
+      const existingRowIndex = rows.findIndex(
+        (row) => row[0] == body.week && row[4] == exercise.name,
+      );
+
+      if (existingRowIndex > 0) {
+        rows[existingRowIndex] = newRow;
+      } else {
+        rows.push(newRow);
+      }
     });
 
-    // Append data
-    await sheets.spreadsheets.values.append({
+    await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${sheetName}!A:I`,
+      range: `${sheetName}!A1`,
       valueInputOption: "RAW",
       requestBody: { values: rows },
     });
 
-    // Get the row where data was appended
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: `${sheetName}!A:A`,
-    });
-    const startRow = (response.data.values?.length ?? 0) - rows.length;
+    try {
+      await styleWorkoutTable(
+        sheets,
+        spreadsheetId,
+        sheetName,
+        rows.length - body.exercises.length,
+        body.exercises.length,
+        10,
+      );
+    } catch (e) {}
 
-    // Style the table
-    await styleWorkoutTable(
-      sheets,
-      spreadsheetId,
-      sheetName,
-      startRow,
-      rows.length,
-      9,
-    );
-
-    console.log("Workout saved successfully to", sheetName);
-
-    return { success: true, message: "Workout saved successfully" };
+    return { success: true, message: "Workout synced successfully" };
   } catch (error: any) {
     console.error("Failed to save workout:", error);
     throw createError({

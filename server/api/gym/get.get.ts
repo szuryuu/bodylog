@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
       try {
         const response = await sheets.spreadsheets.values.get({
           spreadsheetId,
-          range: `${sheetName}!A:I`,
+          range: `${sheetName}!A:J`,
         });
         return { data: response.data.values || [] };
       } catch (error) {

@@ -162,6 +162,7 @@ const saving = ref(false);
 const lastSaved = ref("");
 const saveError = ref("");
 const lastWeekData = ref<Record<number, string[]>>({});
+const isLoading = ref(false);
 
 const programTemplates: Record<
     string,
@@ -273,15 +274,15 @@ async function loadLastWeekData() {
 
             template?.exercises.forEach((exerciseName, idx) => {
                 const exerciseRow = lastWeekWorkouts.find(
-                    (row: any) => row[3] === exerciseName,
+                    (row: any) => row[4] === exerciseName,
                 );
                 if (exerciseRow) {
                     const sets = [
-                        exerciseRow[4],
                         exerciseRow[5],
                         exerciseRow[6],
                         exerciseRow[7],
-                    ].filter((s) => s && s !== "-");
+                        exerciseRow[8],
+                    ].filter((s) => s && s !== "-" && s !== undefined);
                     dataMap[idx] = sets;
                 }
             });
@@ -339,11 +340,55 @@ async function saveWorkout() {
     }
 }
 
+async function loadCurrentSession() {
+    isLoading.value = true;
+    try {
+        const dayNameValue = dayName.value;
+        const { data } = await $fetch(`/api/gym/get?day=${dayNameValue}`);
+
+        const currentSessionRows = data.filter(
+            (row: any) => parseInt(row[0]) === props.week,
+        );
+
+        if (currentSessionRows.length > 0) {
+            exercises.value.forEach((exercise) => {
+                const savedRow = currentSessionRows.find(
+                    (row: any) => row[4] === exercise.name,
+                );
+
+                if (savedRow) {
+                    exercise.sets.forEach((set, idx) => {
+                        const setString = savedRow[5 + idx];
+                        if (setString && setString !== "-") {
+                            const parts = setString.split("×");
+                            if (parts.length === 2) {
+                                set.weight =
+                                    parseFloat(
+                                        parts[0].replace("kg", "").trim(),
+                                    ) || 0;
+                                set.reps = parseFloat(parts[1].trim()) || 0;
+                            }
+                        }
+                    });
+                }
+            });
+
+            if (currentSessionRows[0][9] === "YES") {
+                completed.value = true;
+            }
+        }
+    } catch (error) {
+        console.error("Failed to load current session:", error);
+    } finally {
+        isLoading.value = false;
+    }
+}
+
 watch(
     () => props.day,
-    () => {
+    async () => {
         initializeExercises();
-        loadLastWeekData();
+        await Promise.all([loadLastWeekData(), loadCurrentSession()]);
     },
     { immediate: true },
 );
@@ -352,6 +397,7 @@ watch(
     () => props.week,
     () => {
         loadLastWeekData();
+        loadCurrentSession();
     },
 );
 </script>
