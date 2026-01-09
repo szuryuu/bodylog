@@ -28,7 +28,27 @@
             </div>
         </div>
 
-        <form @submit.prevent="saveWorkout" class="divide-y divide-separator">
+        <div
+            v-if="exercises.length === 0"
+            class="flex flex-col items-center justify-center py-24 text-center p-8"
+        >
+            <div
+                class="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-6"
+            >
+                <span class="text-4xl">😴</span>
+            </div>
+            <h3 class="text-2xl font-bold uppercase mb-2">Rest & Recover</h3>
+            <p class="font-mono text-foreground-text opacity-60 max-w-md">
+                No workouts scheduled for today. Take a break, eat well, and get
+                ready for the next grind!
+            </p>
+        </div>
+
+        <form
+            v-else
+            @submit.prevent="saveWorkout"
+            class="divide-y divide-separator"
+        >
             <div
                 v-for="(exercise, exIdx) in exercises"
                 :key="exIdx"
@@ -47,7 +67,6 @@
                     </span>
                 </div>
 
-                <!-- LAST WEEK DATA DISPLAY -->
                 <div
                     v-if="lastWeekData[exIdx]"
                     class="mb-4 p-3 bg-background rounded border border-separator"
@@ -162,7 +181,6 @@ const saving = ref(false);
 const lastSaved = ref("");
 const saveError = ref("");
 const lastWeekData = ref<Record<number, string[]>>({});
-const isLoading = ref(false);
 
 const programTemplates: Record<
     string,
@@ -262,6 +280,8 @@ async function loadLastWeekData() {
 
     try {
         const dayNameValue = dayName.value;
+        if (dayNameValue === "REST DAY") return;
+
         const { data } = await $fetch(`/api/gym/get?day=${dayNameValue}`);
 
         const lastWeekWorkouts = data.filter(
@@ -294,7 +314,52 @@ async function loadLastWeekData() {
     }
 }
 
+async function loadCurrentSession() {
+    try {
+        const dayNameValue = dayName.value;
+        if (dayNameValue === "REST DAY") return;
+
+        const { data } = await $fetch(`/api/gym/get?day=${dayNameValue}`);
+
+        const currentSessionRows = data.filter(
+            (row: any) => parseInt(row[0]) === props.week,
+        );
+
+        if (currentSessionRows.length > 0) {
+            exercises.value.forEach((exercise) => {
+                const savedRow = currentSessionRows.find(
+                    (row: any) => row[4] === exercise.name,
+                );
+
+                if (savedRow) {
+                    exercise.sets.forEach((set, idx) => {
+                        const setString = savedRow[5 + idx];
+                        if (setString && setString !== "-") {
+                            const parts = setString.split("×");
+                            if (parts.length === 2) {
+                                set.weight =
+                                    parseFloat(
+                                        parts[0].replace("kg", "").trim(),
+                                    ) || 0;
+                                set.reps = parseFloat(parts[1].trim()) || 0;
+                            }
+                        }
+                    });
+                }
+            });
+
+            if (currentSessionRows[0][9] === "YES") {
+                completed.value = true;
+            }
+        }
+    } catch (error) {
+        console.error("Failed to load current session:", error);
+    }
+}
+
 async function saveWorkout() {
+    if (dayName.value === "REST DAY") return;
+
     const { isAuthenticated, secureFetch } = useAuth();
 
     if (!isAuthenticated.value) {
@@ -340,55 +405,14 @@ async function saveWorkout() {
     }
 }
 
-async function loadCurrentSession() {
-    isLoading.value = true;
-    try {
-        const dayNameValue = dayName.value;
-        const { data } = await $fetch(`/api/gym/get?day=${dayNameValue}`);
-
-        const currentSessionRows = data.filter(
-            (row: any) => parseInt(row[0]) === props.week,
-        );
-
-        if (currentSessionRows.length > 0) {
-            exercises.value.forEach((exercise) => {
-                const savedRow = currentSessionRows.find(
-                    (row: any) => row[4] === exercise.name,
-                );
-
-                if (savedRow) {
-                    exercise.sets.forEach((set, idx) => {
-                        const setString = savedRow[5 + idx];
-                        if (setString && setString !== "-") {
-                            const parts = setString.split("×");
-                            if (parts.length === 2) {
-                                set.weight =
-                                    parseFloat(
-                                        parts[0].replace("kg", "").trim(),
-                                    ) || 0;
-                                set.reps = parseFloat(parts[1].trim()) || 0;
-                            }
-                        }
-                    });
-                }
-            });
-
-            if (currentSessionRows[0][9] === "YES") {
-                completed.value = true;
-            }
-        }
-    } catch (error) {
-        console.error("Failed to load current session:", error);
-    } finally {
-        isLoading.value = false;
-    }
-}
-
 watch(
     () => props.day,
     async () => {
         initializeExercises();
-        await Promise.all([loadLastWeekData(), loadCurrentSession()]);
+
+        if (dayName.value !== "REST DAY") {
+            await Promise.all([loadLastWeekData(), loadCurrentSession()]);
+        }
     },
     { immediate: true },
 );
@@ -396,8 +420,10 @@ watch(
 watch(
     () => props.week,
     () => {
-        loadLastWeekData();
-        loadCurrentSession();
+        if (dayName.value !== "REST DAY") {
+            loadLastWeekData();
+            loadCurrentSession();
+        }
     },
 );
 </script>

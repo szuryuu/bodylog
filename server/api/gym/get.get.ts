@@ -6,12 +6,14 @@ export default defineEventHandler(async (event) => {
     const query = getQuery(event);
     const day = query.day as string | undefined;
 
+    const getRange = (sheet: string) => `${sheet}!A:J`;
+
     if (day) {
       const sheetName = `GYM-${day}`;
       try {
         const response = await sheets.spreadsheets.values.get({
           spreadsheetId,
-          range: `${sheetName}!A:J`,
+          range: getRange(sheetName),
         });
         return { data: response.data.values || [] };
       } catch (error) {
@@ -27,7 +29,7 @@ export default defineEventHandler(async (event) => {
       try {
         const response = await sheets.spreadsheets.values.get({
           spreadsheetId,
-          range: `${sheetName}!A:I`,
+          range: getRange(sheetName),
         });
         if (response.data.values && response.data.values.length > 0) {
           allData = allData.concat(response.data.values.slice(1));

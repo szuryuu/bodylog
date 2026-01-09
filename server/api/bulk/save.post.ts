@@ -1,55 +1,90 @@
 import type { BulkEntry } from "~/types";
 
+// Handle bulk entry event
 export default defineEventHandler(async (event) => {
   try {
+    // Read request body
     const body = await readBody<BulkEntry>(event);
     const sheets = await getGoogleSheetsClient();
     const spreadsheetId = await getSpreadsheetId();
 
-    console.log("Saving bulk entry to sheet:", spreadsheetId);
-    console.log("Data:", body);
+    // Sheet name constant
+    const sheetName = "BULK";
+    console.log("Saving bulk entry to sheet:", sheetName);
 
-    const existing = await sheets.spreadsheets.values.get({
+    // Get existing sheet values
+    const existingResponse = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "BULK!A1:D1",
+      range: `${sheetName}!A:D`,
     });
 
-    const rows: any[][] = [];
+    // Get raw rows array
+    const rawRows = existingResponse.data.values || [];
 
-    if (!existing.data.values || existing.data.values.length === 0) {
-      rows.push(["Week", "Date", "Weight (kg)", "Notes"]);
+    // Add header if empty
+    if (rawRows.length === 0) {
+      rawRows.push(["Week", "Date", "Weight (kg)", "Notes"]);
     }
 
-    rows.push([body.week, body.date, body.weight, body.notes || ""]);
+    // Exclude header row
+    const dataRows = rawRows.slice(1);
 
-    await sheets.spreadsheets.values.append({
+    // Prepare new row data
+    const newRow = [
+      body.week.toString(),
+      body.date,
+      body.weight.toString(),
+      body.notes || "",
+    ];
+
+    // Find existing week index
+    const existingRowIndex = dataRows.findIndex((row) => row[0] == body.week);
+
+    // Update or add row
+    if (existingRowIndex >= 0) {
+      dataRows[existingRowIndex] = newRow;
+    } else {
+      dataRows.push(newRow);
+    }
+
+    // Sort by week ascending
+    dataRows.sort((a, b) => {
+      const weekA = parseInt(a[0]) || 0;
+      const weekB = parseInt(b[0]) || 0;
+      return weekA - weekB;
+    });
+
+    // Combine header and data
+    const finalRows = [rawRows[0], ...dataRows];
+
+    // Update sheet values
+    await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: "BULK!A:D",
+      range: `${sheetName}!A1`,
       valueInputOption: "RAW",
-      requestBody: { values: rows },
+      requestBody: { values: finalRows },
     });
 
-    // Style table
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: "BULK!A:A",
-    });
-    const startRow = 0;
-    const totalRows = response.data.values?.length ?? 0;
-
-    await styleWorkoutTable(
-      sheets,
-      spreadsheetId,
-      "BULK",
-      startRow,
-      totalRows,
-      4,
-    );
+    try {
+      // Style workout table
+      await styleWorkoutTable(
+        sheets,
+        spreadsheetId,
+        sheetName,
+        finalRows.length,
+        4,
+      );
+    } catch (e) {
+      // Ignore styling error
+      console.error("Styling error (ignored):", e);
+    }
 
     console.log("Bulk entry saved successfully");
 
+    // Return success response
     return { success: true, message: "Weight saved successfully" };
   } catch (error: any) {
+    // Log and throw error
     console.error("Failed to save bulk entry:", error);
     throw createError({
       statusCode: 500,
