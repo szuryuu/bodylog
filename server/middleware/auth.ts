@@ -1,13 +1,7 @@
 export default defineEventHandler((event) => {
   const path = event.path;
 
-  if (
-    path === "/" ||
-    path.startsWith("/_nuxt") ||
-    path.startsWith("/api/gym/get") ||
-    path.startsWith("/api/bulk/get") ||
-    !path.startsWith("/api/")
-  ) {
+  if (path === "/" || path.startsWith("/_nuxt") || !path.startsWith("/api/")) {
     return;
   }
 
