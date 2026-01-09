@@ -54,12 +54,22 @@
                 :key="exIdx"
                 class="p-6 md:p-8 hover:bg-[#fcfbf7] transition-colors group"
             >
-                <div class="flex justify-between items-baseline mb-3">
-                    <h4
-                        class="text-2xl font-bold group-hover:text-primary transition-colors uppercase"
-                    >
-                        {{ exercise.name }}
-                    </h4>
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-3">
+                        <h4
+                            class="text-2xl font-bold group-hover:text-primary transition-colors uppercase"
+                        >
+                            {{ exercise.name }}
+                        </h4>
+                        <a
+                            :href="`https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.name + ' form tutorial')}`"
+                            target="_blank"
+                            class="text-red-500 hover:text-red-600 hover:scale-110 transition-transform opacity-0 group-hover:opacity-100 p-1"
+                            title="Watch tutorial on YouTube"
+                        >
+                            <Youtube class="w-6 h-6" />
+                        </a>
+                    </div>
                     <span
                         class="font-mono text-xs border border-separator px-2 py-1 rounded bg-white"
                     >
@@ -167,7 +177,7 @@
 
 <script setup lang="ts">
 import type { Exercise } from "~/types";
-const { isAuthenticated, secureFetch } = useAuth();
+import { Youtube } from "lucide-vue-next";
 
 const props = defineProps<{
     week: number;
@@ -175,6 +185,8 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(["saved"]);
+
+const { isAuthenticated, secureFetch } = useAuth();
 
 const exercises = ref<Exercise[]>([]);
 const completed = ref(false);
@@ -221,6 +233,7 @@ const programTemplates: Record<
             "Hanging Leg Raise",
         ],
     },
+    // KAMIS REST
     friday: {
         name: "JUMAT",
         focus: "Back Thickness",
@@ -360,8 +373,6 @@ async function loadCurrentSession() {
 
 async function saveWorkout() {
     if (dayName.value === "REST DAY") return;
-
-    const { isAuthenticated, secureFetch } = useAuth();
 
     if (!isAuthenticated.value) {
         navigateTo("/login");
