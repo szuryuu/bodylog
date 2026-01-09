@@ -341,7 +341,8 @@ function selectDay(day: string) {
 
 async function loadHistory() {
     try {
-        const { data } = await $fetch("/api/gym/get");
+        const { secureFetch } = useAuth();
+        const { data } = await secureFetch("/api/gym/get");
 
         const sortedData = (data as any[]).sort((a, b) => {
             const weekA = parseInt(a[0]) || 0;

@@ -167,6 +167,7 @@
 
 <script setup lang="ts">
 import type { Exercise } from "~/types";
+const { isAuthenticated, secureFetch } = useAuth();
 
 const props = defineProps<{
     week: number;
@@ -282,7 +283,7 @@ async function loadLastWeekData() {
         const dayNameValue = dayName.value;
         if (dayNameValue === "REST DAY") return;
 
-        const { data } = await $fetch(`/api/gym/get?day=${dayNameValue}`);
+        const { data } = await secureFetch(`/api/gym/get?day=${dayNameValue}`);
 
         const lastWeekWorkouts = data.filter(
             (row: any) => parseInt(row[0]) === props.week - 1,
@@ -319,7 +320,7 @@ async function loadCurrentSession() {
         const dayNameValue = dayName.value;
         if (dayNameValue === "REST DAY") return;
 
-        const { data } = await $fetch(`/api/gym/get?day=${dayNameValue}`);
+        const { data } = await secureFetch(`/api/gym/get?day=${dayNameValue}`);
 
         const currentSessionRows = data.filter(
             (row: any) => parseInt(row[0]) === props.week,
