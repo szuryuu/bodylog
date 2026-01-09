@@ -6,22 +6,21 @@ export default defineEventHandler(async (event) => {
     const sheets = await getGoogleSheetsClient();
     const spreadsheetId = await getSpreadsheetId();
 
-    console.log("Saving workout to sheet:", spreadsheetId);
+    const sheetName = `GYM-${body.day}`;
+
+    console.log("Saving workout to sheet:", sheetName);
     console.log("Data:", body);
 
-    // Get existing data to check if we need header
     const existing = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "GYM!A1:J1",
+      range: `${sheetName}!A1:I1`,
     });
 
     const rows: any[][] = [];
 
-    // Add header if sheet is empty
     if (!existing.data.values || existing.data.values.length === 0) {
       rows.push([
         "Week",
-        "Day",
         "Date",
         "Time",
         "Exercise",
@@ -40,7 +39,6 @@ export default defineEventHandler(async (event) => {
 
       rows.push([
         body.week,
-        body.day,
         body.date,
         body.time || "-",
         exercise.name,
@@ -52,7 +50,7 @@ export default defineEventHandler(async (event) => {
     // Append data
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: "GYM!A:J",
+      range: `${sheetName}!A:I`,
       valueInputOption: "RAW",
       requestBody: { values: rows },
     });
@@ -60,7 +58,7 @@ export default defineEventHandler(async (event) => {
     // Get the row where data was appended
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "GYM!A:A",
+      range: `${sheetName}!A:A`,
     });
     const startRow = (response.data.values?.length ?? 0) - rows.length;
 
@@ -68,13 +66,13 @@ export default defineEventHandler(async (event) => {
     await styleWorkoutTable(
       sheets,
       spreadsheetId,
-      "GYM",
+      sheetName,
       startRow,
       rows.length,
-      10,
+      9,
     );
 
-    console.log("Workout saved successfully");
+    console.log("Workout saved successfully to", sheetName);
 
     return { success: true, message: "Workout saved successfully" };
   } catch (error: any) {

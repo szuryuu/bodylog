@@ -213,14 +213,27 @@ const days = [
     { label: "Sat", value: "saturday" },
 ];
 
+const programTemplates: Record<string, { name: string }> = {
+    monday: { name: "SENIN" },
+    tuesday: { name: "SELASA" },
+    wednesday: { name: "RABU" },
+    friday: { name: "JUMAT" },
+    saturday: { name: "SABTU" },
+};
+
 async function loadHistory() {
     try {
-        const { data } = await $fetch("/api/gym/get");
+        const dayName = programTemplates[selectedDay.value]?.name || "";
+        const { data } = await $fetch(`/api/gym/get?day=${dayName}`);
         workoutHistory.value = data as any[];
     } catch (error) {
         console.error("Failed to load history:", error);
     }
 }
+
+watch(selectedDay, () => {
+    loadHistory();
+});
 
 function handleSaved() {
     loadHistory();

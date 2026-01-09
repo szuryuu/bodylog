@@ -9,29 +9,22 @@ export default defineEventHandler(async (event) => {
     console.log("Saving bulk entry to sheet:", spreadsheetId);
     console.log("Data:", body);
 
-    // Check if header exists
     const existing = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "BULK!A1:E1",
+      range: "BULK!A1:D1",
     });
 
     const rows: any[][] = [];
 
     if (!existing.data.values || existing.data.values.length === 0) {
-      rows.push(["Week", "Date", "Time", "Weight (kg)", "Notes"]);
+      rows.push(["Week", "Date", "Weight (kg)", "Notes"]);
     }
 
-    rows.push([
-      body.week,
-      body.date,
-      body.time || "-",
-      body.weight,
-      body.notes || "",
-    ]);
+    rows.push([body.week, body.date, body.weight, body.notes || ""]);
 
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: "BULK!A:E",
+      range: "BULK!A:D",
       valueInputOption: "RAW",
       requestBody: { values: rows },
     });
@@ -50,7 +43,7 @@ export default defineEventHandler(async (event) => {
       "BULK",
       startRow,
       totalRows,
-      5,
+      4,
     );
 
     console.log("Bulk entry saved successfully");

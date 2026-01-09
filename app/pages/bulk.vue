@@ -98,6 +98,7 @@
                             <span class="font-black text-xl block"
                                 >{{ entry[2] }} KG</span
                             >
+
                             <span
                                 v-if="entry[3]"
                                 class="text-xs text-foreground-text font-handwriting"

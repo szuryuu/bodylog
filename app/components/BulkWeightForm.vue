@@ -137,17 +137,12 @@ async function saveWeight() {
     try {
         const now = new Date();
         const dateStr = now.toLocaleDateString("id-ID");
-        const timeStr = now.toLocaleTimeString("id-ID", {
-            hour: "2-digit",
-            minute: "2-digit",
-        });
 
         await $fetch("/api/bulk/save", {
             method: "POST",
             body: {
                 week: week.value,
                 date: dateStr,
-                time: timeStr,
                 weight: weight.value,
                 notes: notes.value,
             },

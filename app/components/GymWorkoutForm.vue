@@ -165,7 +165,7 @@ const programTemplates: Record<
             "Incline Dumbbell Press",
             "Lateral Raise",
             "Tricep Pushdown",
-            "Cable Crunch",
+            "Ab Wheel Rollout", // CHANGED FROM: Cable Crunch
         ],
     },
     wednesday: {
