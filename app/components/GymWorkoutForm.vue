@@ -294,8 +294,16 @@ async function loadLastWeekData() {
 }
 
 async function saveWorkout() {
+    const { isAuthenticated, secureFetch } = useAuth();
+
+    if (!isAuthenticated.value) {
+        navigateTo("/login");
+        return;
+    }
+
     saving.value = true;
     saveError.value = "";
+
     try {
         const now = new Date();
         const dateStr = now.toLocaleDateString("id-ID");
@@ -304,7 +312,7 @@ async function saveWorkout() {
             minute: "2-digit",
         });
 
-        await $fetch("/api/gym/save", {
+        await secureFetch("/api/gym/save", {
             method: "POST",
             body: {
                 week: props.week,
@@ -320,7 +328,12 @@ async function saveWorkout() {
         emit("saved");
         completed.value = false;
     } catch (error: any) {
-        saveError.value = error.message || "Failed to save.";
+        if (error.statusCode === 401) {
+            saveError.value = "Session expired. Please login again.";
+            setTimeout(() => navigateTo("/login"), 2000);
+        } else {
+            saveError.value = error.message || "Failed to save.";
+        }
     } finally {
         saving.value = false;
     }

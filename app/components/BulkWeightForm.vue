@@ -130,7 +130,15 @@ const lastSaved = ref("");
 const saveError = ref("");
 
 async function saveWeight() {
+    const { isAuthenticated, secureFetch } = useAuth();
+
+    if (!isAuthenticated.value) {
+        navigateTo("/login");
+        return;
+    }
+
     if (!weight.value) return;
+
     saving.value = true;
     saveError.value = "";
 
@@ -138,7 +146,7 @@ async function saveWeight() {
         const now = new Date();
         const dateStr = now.toLocaleDateString("id-ID");
 
-        await $fetch("/api/bulk/save", {
+        await secureFetch("/api/bulk/save", {
             method: "POST",
             body: {
                 week: week.value,
@@ -152,7 +160,12 @@ async function saveWeight() {
         emit("saved");
         week.value++;
     } catch (error: any) {
-        saveError.value = error.message || "Failed to save.";
+        if (error.statusCode === 401) {
+            saveError.value = "Session expired. Please login again.";
+            setTimeout(() => navigateTo("/login"), 2000);
+        } else {
+            saveError.value = error.message || "Failed to save.";
+        }
     } finally {
         saving.value = false;
     }

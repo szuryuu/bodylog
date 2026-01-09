@@ -3,7 +3,7 @@
         <header
             class="fixed inset-x-0 top-0 z-50 border-b border-separator bg-background/90 backdrop-blur-md"
         >
-            <nav class="inner flex justify-center py-6">
+            <nav class="inner flex justify-between items-center py-6">
                 <div class="flex items-center gap-2 md:gap-6">
                     <NuxtLink
                         to="/"
@@ -47,6 +47,31 @@
                         >
                     </NuxtLink>
                 </div>
+
+                <div class="flex items-center gap-3">
+                    <div v-if="isAuthenticated" class="flex items-center gap-2">
+                        <span
+                            class="w-2 h-2 bg-green-500 rounded-full animate-pulse"
+                        ></span>
+                        <span
+                            class="text-xs font-mono text-foreground-text hidden md:inline"
+                            >Authenticated</span
+                        >
+                        <button
+                            @click="handleLogout"
+                            class="text-xs font-mono text-foreground-text hover:text-red-500 px-2 py-1 rounded hover:bg-red-50 transition-colors"
+                        >
+                            Logout
+                        </button>
+                    </div>
+                    <NuxtLink
+                        v-else
+                        to="/login"
+                        class="text-xs font-mono text-foreground-text hover:text-primary px-3 py-1.5 rounded-lg border border-separator hover:border-primary transition-colors flex items-center justify-center"
+                    >
+                        <Key class="w-4 h-4 mr-2" /> Login
+                    </NuxtLink>
+                </div>
             </nav>
         </header>
 
@@ -71,6 +96,18 @@
         </footer>
     </div>
 </template>
+
+<script setup lang="ts">
+import { Key } from "lucide-vue-next";
+const { isAuthenticated, logout } = useAuth();
+
+function handleLogout() {
+    if (confirm("Are you sure you want to logout?")) {
+        logout();
+        navigateTo("/");
+    }
+}
+</script>
 
 <style>
 /* Transition */

@@ -29,6 +29,7 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    appPassword: process.env.APP_PASSWORD,
     googleServiceAccount: {
       projectId: process.env.GOOGLE_PROJECT_ID,
       privateKey: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),

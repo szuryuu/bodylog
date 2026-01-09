@@ -25,15 +25,24 @@
                 <button
                     v-for="d in days"
                     :key="d.value"
-                    @click="selectedDay = d.value"
+                    @click="selectDay(d.value)"
+                    :disabled="isDayCompleted(d.value)"
                     :class="[
-                        'px-4 py-2 rounded-lg font-bold text-sm transition-all border border-separator font-mono uppercase tracking-wider',
+                        'px-4 py-2 rounded-lg font-bold text-sm transition-all border border-separator font-mono uppercase tracking-wider relative',
                         selectedDay === d.value
                             ? 'bg-primary text-white border-primary shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5'
-                            : 'bg-white text-foreground-text hover:bg-gray-50',
+                            : isDayCompleted(d.value)
+                              ? 'bg-green-50 text-green-700 border-green-200 cursor-not-allowed opacity-60'
+                              : 'bg-white text-foreground-text hover:bg-gray-50',
                     ]"
                 >
                     {{ d.label }}
+                    <span
+                        v-if="isDayCompleted(d.value)"
+                        class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center text-[10px] text-white"
+                    >
+                        ✓
+                    </span>
                 </button>
             </div>
 
@@ -71,14 +80,55 @@
                     />
                 </button>
             </div>
+
+            <div
+                v-if="weekCompletionStatus"
+                class="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-white border border-separator rounded-full"
+            >
+                <span class="font-mono text-xs text-foreground-text">
+                    Week {{ currentWeek }} Progress:
+                </span>
+                <span class="font-bold text-primary">
+                    {{ weekCompletionStatus }}
+                </span>
+            </div>
         </div>
 
         <div class="inner border-x border-separator bg-white">
+            <!-- Warning jika hari sudah complete -->
+            <div
+                v-if="isDayCompleted(selectedDay)"
+                class="p-6 bg-yellow-50 border-b border-yellow-200"
+            >
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">⚠️</span>
+                    <div>
+                        <p class="font-bold text-yellow-900">
+                            This session is already completed
+                        </p>
+                        <p class="text-sm text-yellow-700 font-mono">
+                            Week {{ currentWeek }} - {{ selectedDayName }} has
+                            been logged. Select another day or week.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
             <GymWorkoutForm
+                v-if="!isDayCompleted(selectedDay)"
                 :week="currentWeek"
                 :day="selectedDay"
                 @saved="handleSaved"
             />
+
+            <div
+                v-else
+                class="p-8 text-center border-b border-separator bg-background"
+            >
+                <p class="font-mono text-sm text-foreground-text opacity-60">
+                    Workout already logged. View it in Recent Logs below.
+                </p>
+            </div>
         </div>
 
         <div class="inner border-x bg-white border-t border-separator">
@@ -203,6 +253,7 @@ import {
 const currentWeek = ref(1);
 const selectedDay = ref("monday");
 const workoutHistory = ref<any[]>([]);
+const completedSessions = ref<Set<string>>(new Set());
 
 const days = [
     { label: "Mon", value: "monday" },
@@ -221,10 +272,38 @@ const programTemplates: Record<string, { name: string }> = {
     saturday: { name: "SABTU" },
 };
 
+const selectedDayName = computed(
+    () => programTemplates[selectedDay.value]?.name || selectedDay.value,
+);
+
+const weekCompletionStatus = computed(() => {
+    const workoutDays = [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "friday",
+        "saturday",
+    ];
+    const completed = workoutDays.filter((day) => isDayCompleted(day)).length;
+    return `${completed}/5 sessions`;
+});
+
+function isDayCompleted(day: string): boolean {
+    const dayName = programTemplates[day]?.name;
+    if (!dayName) return false;
+    const key = `${currentWeek.value}-${dayName}`;
+    return completedSessions.value.has(key);
+}
+
+function selectDay(day: string) {
+    if (!isDayCompleted(day)) {
+        selectedDay.value = day;
+    }
+}
+
 async function loadHistory() {
     try {
-        const dayName = programTemplates[selectedDay.value]?.name || "";
-        const { data } = await $fetch(`/api/gym/get?day=${dayName}`);
+        const { data } = await $fetch("/api/gym/get");
 
         const sortedData = (data as any[]).sort((a, b) => {
             const weekA = parseInt(a[0]) || 0;
@@ -233,18 +312,94 @@ async function loadHistory() {
         });
 
         workoutHistory.value = sortedData;
+
+        const sessions = new Set<string>();
+        sortedData.forEach((row) => {
+            const week = row[0];
+            const day = row[1];
+            if (week && day) {
+                sessions.add(`${week}-${day}`);
+            }
+        });
+        completedSessions.value = sessions;
+
+        detectCurrentWeek();
     } catch (error) {
         console.error("Failed to load history:", error);
     }
 }
 
-watch(selectedDay, () => {
-    loadHistory();
-});
+function detectCurrentWeek() {
+    if (workoutHistory.value.length === 0) {
+        currentWeek.value = 1;
+        return;
+    }
+
+    const maxWeek = Math.max(
+        ...workoutHistory.value.map((row) => parseInt(row[0]) || 0),
+    );
+
+    const workoutDays = ["SENIN", "SELASA", "RABU", "JUMAT", "SABTU"];
+    const maxWeekSessions = workoutHistory.value.filter(
+        (row) => parseInt(row[0]) === maxWeek,
+    );
+
+    const uniqueDaysInMaxWeek = new Set(maxWeekSessions.map((row) => row[1]))
+        .size;
+
+    if (uniqueDaysInMaxWeek >= 5) {
+        currentWeek.value = maxWeek + 1;
+    } else {
+        currentWeek.value = maxWeek;
+    }
+
+    selectFirstIncompleteDay();
+}
+
+function selectFirstIncompleteDay() {
+    const workoutDays = [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "friday",
+        "saturday",
+    ];
+    for (const day of workoutDays) {
+        if (!isDayCompleted(day)) {
+            selectedDay.value = day;
+            return;
+        }
+    }
+    selectedDay.value = "monday";
+}
 
 function handleSaved() {
     loadHistory();
+
+    setTimeout(() => {
+        const workoutDays = [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "friday",
+            "saturday",
+        ];
+        const completedCount = workoutDays.filter((day) =>
+            isDayCompleted(day),
+        ).length;
+
+        if (completedCount >= 5) {
+            currentWeek.value++;
+            selectedDay.value = "monday";
+        } else {
+            selectFirstIncompleteDay();
+        }
+    }, 500);
 }
+
+watch(currentWeek, () => {
+    selectFirstIncompleteDay();
+});
 
 onMounted(() => {
     loadHistory();

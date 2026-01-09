@@ -59,7 +59,7 @@
                                 class="text-4xl text-foreground-primary group-hover:rotate-12 transition-transform"
                             >
                                 <Dumbbell
-                                    class="w-12 h-12 text-primary rotate-[-15deg]"
+                                    class="w-12 h-12 text-primary"
                                     :stroke-width="1.5"
                                 />
                             </span>
