@@ -21,6 +21,16 @@
                 Gym Log
             </h1>
 
+            <!-- Today indicator -->
+            <div
+                class="mb-6 inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full"
+            >
+                <Calendar class="w-4 h-4 text-primary" />
+                <span class="font-mono text-sm text-primary font-bold">
+                    Today: {{ todayDayName }} • Week {{ calculatedWeek }}
+                </span>
+            </div>
+
             <div class="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
                 <button
                     v-for="d in days"
@@ -33,7 +43,9 @@
                             ? 'bg-primary text-white border-primary shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5'
                             : isDayCompleted(d.value)
                               ? 'bg-green-50 text-green-700 border-green-200 cursor-not-allowed opacity-60'
-                              : 'bg-white text-foreground-text hover:bg-gray-50',
+                              : d.value === todayDay
+                                ? 'bg-primary/5 text-primary border-primary hover:bg-primary/10'
+                                : 'bg-white text-foreground-text hover:bg-gray-50',
                     ]"
                 >
                     {{ d.label }}
@@ -43,6 +55,10 @@
                     >
                         ✓
                     </span>
+                    <span
+                        v-if="d.value === todayDay && !isDayCompleted(d.value)"
+                        class="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-pulse"
+                    ></span>
                 </button>
             </div>
 
@@ -81,6 +97,7 @@
                 </button>
             </div>
 
+            <!-- Week completion status -->
             <div
                 v-if="weekCompletionStatus"
                 class="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-white border border-separator rounded-full"
@@ -95,13 +112,12 @@
         </div>
 
         <div class="inner border-x border-separator bg-white">
-            <!-- Warning jika hari sudah complete -->
             <div
                 v-if="isDayCompleted(selectedDay)"
                 class="p-6 bg-yellow-50 border-b border-yellow-200"
             >
                 <div class="flex items-center gap-3">
-                    <span class="text-2xl">⚠️</span>
+                    <span class="text-2xl">warn logo</span>
                     <div>
                         <p class="font-bold text-yellow-900">
                             This session is already completed
@@ -163,7 +179,10 @@
 
                     <div class="divide-y divide-separator">
                         <div
-                            v-for="(workout, idx) in workoutHistory.slice(0, 5)"
+                            v-for="(workout, idx) in workoutHistory.slice(
+                                0,
+                                10,
+                            )"
                             :key="idx"
                             class="grid grid-cols-12 gap-4 p-4 items-center hover:bg-[#fcfbf7] transition-colors group"
                         >
@@ -229,8 +248,8 @@
                         No workouts logged yet.
                     </p>
                     <button
-                        @click="currentWeek = 1"
-                        class="mt-4 text-primary text-xs font-bold uppercase hover:underline"
+                        @click="initializeProgram"
+                        class="mt-4 px-6 py-2 bg-primary text-white rounded-lg text-sm font-bold uppercase hover:bg-foreground-primary transition-colors"
                     >
                         Start Week 1
                     </button>
@@ -250,6 +269,8 @@ import {
     CheckCircle2,
 } from "lucide-vue-next";
 
+const PROGRAM_START_DATE = new Date("2025-12-30");
+
 const currentWeek = ref(1);
 const selectedDay = ref("monday");
 const workoutHistory = ref<any[]>([]);
@@ -268,9 +289,45 @@ const programTemplates: Record<string, { name: string }> = {
     monday: { name: "SENIN" },
     tuesday: { name: "SELASA" },
     wednesday: { name: "RABU" },
+    thursday: { name: "KAMIS" },
     friday: { name: "JUMAT" },
     saturday: { name: "SABTU" },
+    sunday: { name: "MINGGU" },
 };
+
+const calculatedWeek = computed(() => {
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - PROGRAM_START_DATE.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const week = Math.ceil(diffDays / 7);
+    return Math.max(1, week);
+});
+
+const todayDay = computed(() => {
+    const dayMap = [
+        "sunday",
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+    ];
+    return dayMap[new Date().getDay()];
+});
+
+const todayDayName = computed(() => {
+    const dayNames = {
+        sunday: "Minggu",
+        monday: "Senin",
+        tuesday: "Selasa",
+        wednesday: "Rabu",
+        thursday: "Kamis",
+        friday: "Jumat",
+        saturday: "Sabtu",
+    };
+    return dayNames[todayDay.value as keyof typeof dayNames];
+});
 
 const selectedDayName = computed(
     () => programTemplates[selectedDay.value]?.name || selectedDay.value,
@@ -322,38 +379,29 @@ async function loadHistory() {
             }
         });
         completedSessions.value = sessions;
-
-        detectCurrentWeek();
     } catch (error) {
         console.error("Failed to load history:", error);
     }
 }
 
-function detectCurrentWeek() {
-    if (workoutHistory.value.length === 0) {
-        currentWeek.value = 1;
-        return;
-    }
+function initializeProgram() {
+    currentWeek.value = calculatedWeek.value;
 
-    const maxWeek = Math.max(
-        ...workoutHistory.value.map((row) => parseInt(row[0]) || 0),
-    );
-
-    const workoutDays = ["SENIN", "SELASA", "RABU", "JUMAT", "SABTU"];
-    const maxWeekSessions = workoutHistory.value.filter(
-        (row) => parseInt(row[0]) === maxWeek,
-    );
-
-    const uniqueDaysInMaxWeek = new Set(maxWeekSessions.map((row) => row[1]))
-        .size;
-
-    if (uniqueDaysInMaxWeek >= 5) {
-        currentWeek.value = maxWeek + 1;
+    const workoutDays = [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "friday",
+        "saturday",
+    ];
+    if (
+        workoutDays.includes(todayDay.value) &&
+        !isDayCompleted(todayDay.value)
+    ) {
+        selectedDay.value = todayDay.value;
     } else {
-        currentWeek.value = maxWeek;
+        selectFirstIncompleteDay();
     }
-
-    selectFirstIncompleteDay();
 }
 
 function selectFirstIncompleteDay() {
@@ -364,36 +412,32 @@ function selectFirstIncompleteDay() {
         "friday",
         "saturday",
     ];
+
+    if (
+        workoutDays.includes(todayDay.value) &&
+        !isDayCompleted(todayDay.value)
+    ) {
+        selectedDay.value = todayDay.value;
+        return;
+    }
+
     for (const day of workoutDays) {
         if (!isDayCompleted(day)) {
             selectedDay.value = day;
             return;
         }
     }
-    selectedDay.value = "monday";
+
+    selectedDay.value = workoutDays.includes(todayDay.value)
+        ? todayDay.value
+        : "monday";
 }
 
 function handleSaved() {
     loadHistory();
 
     setTimeout(() => {
-        const workoutDays = [
-            "monday",
-            "tuesday",
-            "wednesday",
-            "friday",
-            "saturday",
-        ];
-        const completedCount = workoutDays.filter((day) =>
-            isDayCompleted(day),
-        ).length;
-
-        if (completedCount >= 5) {
-            currentWeek.value++;
-            selectedDay.value = "monday";
-        } else {
-            selectFirstIncompleteDay();
-        }
+        selectFirstIncompleteDay();
     }, 500);
 }
 
@@ -402,6 +446,12 @@ watch(currentWeek, () => {
 });
 
 onMounted(() => {
+    currentWeek.value = calculatedWeek.value;
+
     loadHistory();
+
+    nextTick(() => {
+        initializeProgram();
+    });
 });
 </script>
