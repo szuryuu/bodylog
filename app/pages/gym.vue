@@ -225,7 +225,14 @@ async function loadHistory() {
     try {
         const dayName = programTemplates[selectedDay.value]?.name || "";
         const { data } = await $fetch(`/api/gym/get?day=${dayName}`);
-        workoutHistory.value = data as any[];
+
+        const sortedData = (data as any[]).sort((a, b) => {
+            const weekA = parseInt(a[0]) || 0;
+            const weekB = parseInt(b[0]) || 0;
+            return weekB - weekA;
+        });
+
+        workoutHistory.value = sortedData;
     } catch (error) {
         console.error("Failed to load history:", error);
     }

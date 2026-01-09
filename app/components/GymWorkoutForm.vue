@@ -34,7 +34,7 @@
                 :key="exIdx"
                 class="p-6 md:p-8 hover:bg-[#fcfbf7] transition-colors group"
             >
-                <div class="flex justify-between items-baseline mb-6">
+                <div class="flex justify-between items-baseline mb-3">
                     <h4
                         class="text-2xl font-bold group-hover:text-primary transition-colors uppercase"
                     >
@@ -45,6 +45,27 @@
                     >
                         {{ exercise.sets.length }} SETS
                     </span>
+                </div>
+
+                <!-- LAST WEEK DATA DISPLAY -->
+                <div
+                    v-if="lastWeekData[exIdx]"
+                    class="mb-4 p-3 bg-background rounded border border-separator"
+                >
+                    <span
+                        class="font-mono text-xs uppercase tracking-wider text-foreground-text opacity-70"
+                    >
+                        Last Week (W{{ week - 1 }}):
+                    </span>
+                    <div class="flex gap-2 mt-1 flex-wrap">
+                        <span
+                            v-for="(set, idx) in lastWeekData[exIdx]"
+                            :key="idx"
+                            class="font-mono text-xs bg-white px-2 py-1 rounded border border-separator"
+                        >
+                            {{ set }}
+                        </span>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -140,6 +161,7 @@ const completed = ref(false);
 const saving = ref(false);
 const lastSaved = ref("");
 const saveError = ref("");
+const lastWeekData = ref<Record<number, string[]>>({});
 
 const programTemplates: Record<
     string,
@@ -165,7 +187,7 @@ const programTemplates: Record<
             "Incline Dumbbell Press",
             "Lateral Raise",
             "Tricep Pushdown",
-            "Ab Wheel Rollout", // CHANGED FROM: Cable Crunch
+            "Tricep Overhead Extension",
         ],
     },
     wednesday: {
@@ -231,6 +253,46 @@ function initializeExercises() {
     });
 }
 
+async function loadLastWeekData() {
+    if (props.week <= 1) {
+        lastWeekData.value = {};
+        return;
+    }
+
+    try {
+        const dayNameValue = dayName.value;
+        const { data } = await $fetch(`/api/gym/get?day=${dayNameValue}`);
+
+        const lastWeekWorkouts = data.filter(
+            (row: any) => parseInt(row[0]) === props.week - 1,
+        );
+
+        if (lastWeekWorkouts.length > 0) {
+            const template = programTemplates[props.day];
+            const dataMap: Record<number, string[]> = {};
+
+            template?.exercises.forEach((exerciseName, idx) => {
+                const exerciseRow = lastWeekWorkouts.find(
+                    (row: any) => row[3] === exerciseName,
+                );
+                if (exerciseRow) {
+                    const sets = [
+                        exerciseRow[4],
+                        exerciseRow[5],
+                        exerciseRow[6],
+                        exerciseRow[7],
+                    ].filter((s) => s && s !== "-");
+                    dataMap[idx] = sets;
+                }
+            });
+
+            lastWeekData.value = dataMap;
+        }
+    } catch (error) {
+        console.error("Failed to load last week data:", error);
+    }
+}
+
 async function saveWorkout() {
     saving.value = true;
     saveError.value = "";
@@ -264,5 +326,19 @@ async function saveWorkout() {
     }
 }
 
-watch(() => props.day, initializeExercises, { immediate: true });
+watch(
+    () => props.day,
+    () => {
+        initializeExercises();
+        loadLastWeekData();
+    },
+    { immediate: true },
+);
+
+watch(
+    () => props.week,
+    () => {
+        loadLastWeekData();
+    },
+);
 </script>

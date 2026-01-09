@@ -31,90 +31,91 @@ export async function styleWorkoutTable(
   numCols: number,
 ) {
   const sheetId = await getSheetId(sheets, spreadsheetId, sheetName);
+  const requests: any[] = [];
+
+  if (startRow === 0) {
+    requests.push({
+      repeatCell: {
+        range: {
+          sheetId,
+          startRowIndex: 0,
+          endRowIndex: 1,
+          startColumnIndex: 0,
+          endColumnIndex: numCols,
+        },
+        cell: {
+          userEnteredFormat: {
+            backgroundColor: { red: 0.2, green: 0.2, blue: 0.2 },
+            textFormat: {
+              bold: true,
+              foregroundColor: { red: 1, green: 1, blue: 1 },
+            },
+            horizontalAlignment: "CENTER",
+          },
+        },
+        fields:
+          "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)",
+      },
+    });
+  }
+
+  requests.push({
+    updateBorders: {
+      range: {
+        sheetId,
+        startRowIndex: 0,
+        endRowIndex: startRow + numRows,
+        startColumnIndex: 0,
+        endColumnIndex: numCols,
+      },
+      top: {
+        style: "SOLID",
+        width: 1,
+        color: { red: 0.5, green: 0.5, blue: 0.5 },
+      },
+      bottom: {
+        style: "SOLID",
+        width: 1,
+        color: { red: 0.5, green: 0.5, blue: 0.5 },
+      },
+      left: {
+        style: "SOLID",
+        width: 1,
+        color: { red: 0.5, green: 0.5, blue: 0.5 },
+      },
+      right: {
+        style: "SOLID",
+        width: 1,
+        color: { red: 0.5, green: 0.5, blue: 0.5 },
+      },
+      innerHorizontal: {
+        style: "SOLID",
+        width: 1,
+        color: { red: 0.3, green: 0.3, blue: 0.3 },
+      },
+      innerVertical: {
+        style: "SOLID",
+        width: 1,
+        color: { red: 0.3, green: 0.3, blue: 0.3 },
+      },
+    },
+  });
+
+  // Auto-resize columns
+  requests.push({
+    autoResizeDimensions: {
+      dimensions: {
+        sheetId,
+        dimension: "COLUMNS",
+        startIndex: 0,
+        endIndex: numCols,
+      },
+    },
+  });
 
   await sheets.spreadsheets.batchUpdate({
     spreadsheetId,
-    requestBody: {
-      requests: [
-        // Header row styling
-        {
-          repeatCell: {
-            range: {
-              sheetId,
-              startRowIndex: startRow,
-              endRowIndex: startRow + 1,
-              startColumnIndex: 0,
-              endColumnIndex: numCols,
-            },
-            cell: {
-              userEnteredFormat: {
-                backgroundColor: { red: 0.2, green: 0.2, blue: 0.2 },
-                textFormat: {
-                  bold: true,
-                  foregroundColor: { red: 1, green: 1, blue: 1 },
-                },
-                horizontalAlignment: "CENTER",
-              },
-            },
-            fields:
-              "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)",
-          },
-        },
-        // Add borders
-        {
-          updateBorders: {
-            range: {
-              sheetId,
-              startRowIndex: startRow,
-              endRowIndex: startRow + numRows,
-              startColumnIndex: 0,
-              endColumnIndex: numCols,
-            },
-            top: {
-              style: "SOLID",
-              width: 1,
-              color: { red: 0.5, green: 0.5, blue: 0.5 },
-            },
-            bottom: {
-              style: "SOLID",
-              width: 1,
-              color: { red: 0.5, green: 0.5, blue: 0.5 },
-            },
-            left: {
-              style: "SOLID",
-              width: 1,
-              color: { red: 0.5, green: 0.5, blue: 0.5 },
-            },
-            right: {
-              style: "SOLID",
-              width: 1,
-              color: { red: 0.5, green: 0.5, blue: 0.5 },
-            },
-            innerHorizontal: {
-              style: "SOLID",
-              width: 1,
-              color: { red: 0.3, green: 0.3, blue: 0.3 },
-            },
-            innerVertical: {
-              style: "SOLID",
-              width: 1,
-              color: { red: 0.3, green: 0.3, blue: 0.3 },
-            },
-          },
-        },
-        // Auto-resize columns
-        {
-          autoResizeDimensions: {
-            dimensions: {
-              sheetId,
-              dimension: "COLUMNS",
-              startIndex: 0,
-              endIndex: numCols,
-            },
-          },
-        },
-      ],
-    },
+    requestBody: { requests },
   });
 }
 
