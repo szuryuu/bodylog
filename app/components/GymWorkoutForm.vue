@@ -54,28 +54,31 @@
                 :key="exIdx"
                 class="p-6 md:p-8 hover:bg-[#fcfbf7] transition-colors group"
             >
-                <div class="flex justify-between items-center mb-3">
-                    <div class="flex items-center gap-3">
-                        <h4
-                            class="text-2xl font-bold group-hover:text-primary transition-colors uppercase"
+                <div class="flex justify-between items-start mb-4 gap-4">
+                    <h4
+                        class="text-2xl font-bold group-hover:text-primary transition-colors uppercase leading-tight"
+                    >
+                        {{ exercise.name }}
+                    </h4>
+
+                    <div class="flex flex-col items-end gap-2 shrink-0">
+                        <span
+                            class="font-mono text-xs border border-separator px-2 py-1 rounded bg-white whitespace-nowrap"
                         >
-                            {{ exercise.name }}
-                        </h4>
+                            {{ exercise.sets.length }} SETS
+                        </span>
 
                         <a
                             :href="`https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.name + ' form tutorial')}`"
                             target="_blank"
-                            class="text-red-500 hover:text-red-600 hover:scale-110 transition-transform p-1 opacity-100 md:opacity-0 md:group-hover:opacity-100"
-                            title="Watch tutorial on YouTube"
+                            class="flex items-center gap-1.5 px-2 py-1 bg-red-50 text-red-600 border border-red-100 rounded hover:bg-red-600 hover:text-white hover:border-red-600 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
                         >
-                            <Youtube class="w-6 h-6" />
+                            <Youtube class="w-3 h-3" />
+                            <span class="font-bold text-[10px] tracking-wider"
+                                >WATCH</span
+                            >
                         </a>
                     </div>
-                    <span
-                        class="font-mono text-xs border border-separator px-2 py-1 rounded bg-white"
-                    >
-                        {{ exercise.sets.length }} SETS
-                    </span>
                 </div>
 
                 <div
@@ -186,7 +189,6 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(["saved"]);
-
 const { isAuthenticated, secureFetch } = useAuth();
 
 const exercises = ref<Exercise[]>([]);
@@ -196,6 +198,7 @@ const lastSaved = ref("");
 const saveError = ref("");
 const lastWeekData = ref<Record<number, string[]>>({});
 
+// PROGRAM TEMPLATES
 const programTemplates: Record<
     string,
     { name: string; focus: string; exercises: string[] }
@@ -234,7 +237,6 @@ const programTemplates: Record<
             "Hanging Leg Raise",
         ],
     },
-    // KAMIS REST
     friday: {
         name: "JUMAT",
         focus: "Back Thickness",
