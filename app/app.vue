@@ -43,6 +43,15 @@
                         >
                         Weigh In
                     </NuxtLink>
+                    <NuxtLink
+                        to="/coach"
+                        class="flex items-center gap-1 text-sm font-bold uppercase tracking-wide hover:text-primary transition-colors text-primary"
+                    >
+                        <span class="font-mono text-primary text-[10px] -mt-3"
+                            >03</span
+                        >
+                        AI Coach
+                    </NuxtLink>
                 </div>
 
                 <div class="flex items-center gap-4">
@@ -119,6 +128,17 @@
                             >
                             WEIGH IN
                         </NuxtLink>
+                        <NuxtLink
+                            to="/coach"
+                            @click="isMenuOpen = false"
+                            class="text-4xl font-black uppercase hover:text-primary transition-colors block text-primary"
+                        >
+                            <span
+                                class="text-primary text-sm font-mono mb-1 block"
+                                >03</span
+                            >
+                            AI COACH
+                        </NuxtLink>
 
                         <div class="h-px bg-separator my-4"></div>
 
@@ -175,7 +195,6 @@
                     >
                         <LogOut class="w-8 h-8 text-red-500" />
                     </div>
-
                     <h3 class="text-3xl font-black uppercase mb-2">
                         Logging Out?
                     </h3>
@@ -185,7 +204,6 @@
                         Your session will be ended. Make sure you've saved your
                         gains.
                     </p>
-
                     <div class="flex flex-col gap-3">
                         <button
                             @click="confirmLogout"
@@ -226,7 +244,7 @@ function confirmLogout() {
 </script>
 
 <style scoped>
-/* Menu Transition */
+/* Transition */
 .menu-enter-active,
 .menu-leave-active {
     transition: all 0.3s ease-in-out;
