@@ -13,7 +13,7 @@
                 <h1
                     class="text-5xl sm:text-7xl lg:text-8xl font-black uppercase leading-[0.9] text-foreground-primary"
                 >
-                    V-SHAPE
+                    SHAPED
                     <span class="text-primary block sm:inline">PROGRAM</span>
                 </h1>
 

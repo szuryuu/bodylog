@@ -121,6 +121,7 @@
 </template>
 
 <script setup lang="ts">
+const { secureFetch } = useAuth();
 const weightData = ref<any[]>([]);
 
 const currentWeight = computed(() => {
@@ -142,7 +143,7 @@ const totalGained = computed(() => {
 
 async function loadWeightData() {
     try {
-        const { data } = await $fetch("/api/bulk/get");
+        const { data } = await secureFetch("/api/bulk/get");
         weightData.value = data as any[];
     } catch (error) {
         console.error("Failed to load weight data:", error);
