@@ -33,9 +33,9 @@
             class="flex flex-col items-center justify-center py-24 text-center p-8"
         >
             <div
-                class="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-6"
+                class="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-6 text-primary"
             >
-                <span class="text-4xl">😴</span>
+                <BedDouble class="w-10 h-10" />
             </div>
             <h3 class="text-2xl font-bold uppercase mb-2">Rest & Recover</h3>
             <p class="font-mono text-foreground-text opacity-60 max-w-md">
@@ -144,10 +144,10 @@
                         <div
                             class="w-6 h-6 border-2 border-border rounded flex items-center justify-center transition-colors peer-checked:bg-primary peer-checked:border-primary"
                         >
-                            <span
-                                class="text-white text-sm opacity-0 peer-checked:opacity-100"
-                                >✓</span
-                            >
+                            <Check
+                                class="w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity"
+                                stroke-width="3"
+                            />
                         </div>
                         <span
                             class="font-bold text-foreground-primary group-hover:text-primary transition-colors"
@@ -177,7 +177,7 @@
 
 <script setup lang="ts">
 import type { Exercise } from "~/types";
-import { Youtube } from "lucide-vue-next";
+import { Youtube, BedDouble, Check } from "lucide-vue-next";
 
 const props = defineProps<{
     week: number;

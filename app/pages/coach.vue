@@ -99,7 +99,7 @@
                 <button
                     @click="handleSummonTrainer"
                     :disabled="loading || !userHeight"
-                    class="w-full md:w-auto px-12 py-6 bg-foreground-primary text-white text-xl md:text-2xl font-black uppercase tracking-wider rounded-xl hover:bg-primary hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center gap-4 disabled:opacity-70 disabled:cursor-not-allowed group"
+                    class="w-full px-12 py-6 bg-foreground-primary text-white text-xl md:text-2xl font-black uppercase tracking-wider rounded-xl hover:bg-primary hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center gap-4 disabled:opacity-70 disabled:cursor-not-allowed group"
                 >
                     <Loader2 v-if="loading" class="w-8 h-8 animate-spin" />
                     <div v-else class="flex items-center gap-3">
