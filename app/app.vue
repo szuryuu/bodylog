@@ -1,12 +1,16 @@
 <template>
-    <div class="min-h-screen flex flex-col font-sans text-foreground-primary">
+    <div
+        class="min-h-screen flex flex-col font-sans text-foreground-primary overflow-x-hidden"
+    >
         <header
             class="fixed inset-x-0 top-0 z-50 border-b border-separator bg-background/95 backdrop-blur-sm"
         >
-            <nav class="inner flex justify-between items-center h-20">
+            <nav
+                class="inner flex justify-between items-center h-20 px-4 md:px-0"
+            >
                 <NuxtLink
                     to="/"
-                    class="font-black text-2xl tracking-tighter hover:text-primary transition-colors"
+                    class="font-black text-2xl tracking-tighter hover:text-primary transition-colors shrink-0"
                 >
                     BODYLOG
                 </NuxtLink>
@@ -68,7 +72,7 @@
 
                     <button
                         @click="isMenuOpen = !isMenuOpen"
-                        class="md:hidden p-2 hover:bg-black/5 rounded-lg transition-colors"
+                        class="md:hidden p-2 hover:bg-black/5 rounded-lg transition-colors focus:outline-none"
                     >
                         <Menu v-if="!isMenuOpen" class="w-8 h-8" />
                         <X v-else class="w-8 h-8" />
@@ -79,13 +83,13 @@
             <transition name="menu">
                 <div
                     v-if="isMenuOpen"
-                    class="md:hidden absolute top-20 left-0 w-full bg-background border-b border-separator h-[calc(100vh-5rem)] overflow-y-auto"
+                    class="md:hidden absolute top-20 left-0 w-full bg-background border-b border-separator h-[calc(100vh-5rem)] overflow-y-auto z-40"
                 >
-                    <div class="inner py-8 flex flex-col gap-6">
+                    <div class="inner py-8 flex flex-col gap-6 px-4">
                         <NuxtLink
                             to="/"
                             @click="isMenuOpen = false"
-                            class="text-4xl font-black uppercase hover:text-primary transition-colors"
+                            class="text-4xl font-black uppercase hover:text-primary transition-colors block"
                         >
                             <span
                                 class="text-primary text-sm font-mono mb-1 block"
@@ -96,7 +100,7 @@
                         <NuxtLink
                             to="/gym"
                             @click="isMenuOpen = false"
-                            class="text-4xl font-black uppercase hover:text-primary transition-colors"
+                            class="text-4xl font-black uppercase hover:text-primary transition-colors block"
                         >
                             <span
                                 class="text-primary text-sm font-mono mb-1 block"
@@ -107,7 +111,7 @@
                         <NuxtLink
                             to="/bulk"
                             @click="isMenuOpen = false"
-                            class="text-4xl font-black uppercase hover:text-primary transition-colors"
+                            class="text-4xl font-black uppercase hover:text-primary transition-colors block"
                         >
                             <span
                                 class="text-primary text-sm font-mono mb-1 block"
@@ -121,7 +125,7 @@
                         <div v-if="isAuthenticated">
                             <button
                                 @click="handleLogout"
-                                class="text-4xl font-black uppercase text-red-500 hover:text-red-600 transition-colors"
+                                class="text-4xl font-black uppercase text-red-500 hover:text-red-600 transition-colors w-full text-left"
                             >
                                 LOGOUT
                             </button>
@@ -130,7 +134,7 @@
                             v-else
                             to="/login"
                             @click="isMenuOpen = false"
-                            class="text-4xl font-black uppercase hover:text-primary transition-colors"
+                            class="text-4xl font-black uppercase hover:text-primary transition-colors block"
                         >
                             LOGIN
                         </NuxtLink>
@@ -139,7 +143,7 @@
             </transition>
         </header>
 
-        <main class="flex-1 pt-20">
+        <main class="flex-1 pt-20 w-full max-w-[100vw] overflow-x-hidden">
             <NuxtPage />
         </main>
 
@@ -175,7 +179,6 @@ function handleLogout() {
 </script>
 
 <style scoped>
-/* Menu Transition */
 .menu-enter-active,
 .menu-leave-active {
     transition: all 0.3s ease-in-out;

@@ -8,9 +8,9 @@
                 >Morning Check-in!</span
             >
             <h2
-                class="text-5xl font-black mb-12 uppercase text-foreground-primary"
+                class="text-4xl md:text-6xl font-black mb-12 uppercase text-foreground-primary"
             >
-                Daily Weigh-In
+                Weekly Weigh-In
             </h2>
 
             <form @submit.prevent="saveWeight" class="space-y-12 max-w-md">

@@ -11,7 +11,7 @@
                 </span>
 
                 <h1
-                    class="text-5xl sm:text-7xl lg:text-8xl font-black uppercase leading-[0.9] text-foreground-primary"
+                    class="text-4xl md:text-7xl lg:text-8xl font-black uppercase leading-none text-foreground-primary py-2"
                 >
                     SHAPED
                     <span class="text-primary block sm:inline">PROGRAM</span>
