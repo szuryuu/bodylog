@@ -61,10 +61,11 @@
                         >
                             {{ exercise.name }}
                         </h4>
+
                         <a
                             :href="`https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.name + ' form tutorial')}`"
                             target="_blank"
-                            class="text-red-500 hover:text-red-600 hover:scale-110 transition-transform opacity-0 group-hover:opacity-100 p-1"
+                            class="text-red-500 hover:text-red-600 hover:scale-110 transition-transform p-1 opacity-100 md:opacity-0 md:group-hover:opacity-100"
                             title="Watch tutorial on YouTube"
                         >
                             <Youtube class="w-6 h-6" />
