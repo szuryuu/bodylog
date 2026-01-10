@@ -252,7 +252,7 @@ import {
     CheckCircle2,
 } from "lucide-vue-next";
 
-const PROGRAM_START_DATE = new Date("2026-01-05");
+const PROGRAM_START_DATE = new Date("2026-01-12");
 
 const currentWeek = ref(1);
 const selectedDay = ref("monday");
