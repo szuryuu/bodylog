@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="inner border-b border-separator pb-20 relative">
+        <div class="inner border-b border-separator pb-20 pt-12 relative">
             <div
                 class="mx-auto flex flex-col justify-center gap-6 lg:max-w-4xl lg:items-center lg:text-center z-10 relative"
             >
