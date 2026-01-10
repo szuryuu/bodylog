@@ -1,6 +1,6 @@
 # BodyLog - Minimalist Gym & Weight Tracker
 
-This repository contains a web application designed to track gym workouts and body weight progress. It is built with Nuxt 3 and uses Google Sheets as a backend database, ensuring you have full control and ownership of your data.
+This repository contains a web application designed to track gym workouts and body weight progress. It is built with Nuxt 4 and uses Google Sheets as a backend database, ensuring you have full control and ownership of your data.
 
 ---
 
@@ -52,15 +52,15 @@ Create a `.env` file in the root of your project and add the following variables
 
 ```env
 # Your chosen password to access the app
-NUXT_APP_PASSWORD=your_secure_password
+APP_PASSWORD=your_secure_password
 
 # The ID obtained in Step 3
-NUXT_SPREADSHEET_ID=your_spreadsheet_id
+SPREADSHEET_ID=your_spreadsheet_id
 
 # Details from the JSON file obtained in Step 2
-NUXT_GOOGLE_SERVICE_ACCOUNT_PROJECT_ID=your_project_id
-NUXT_GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL=your_service_account_email
-NUXT_GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+GOOGLE_PROJECT_ID=your_project_id
+GOOGLE_CLIENT_EMAIL=your_service_account_email
+GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 ```
 
 > **Note:** When pasting the Private Key into Vercel or a `.env` file, ensure the entire key string is included.
