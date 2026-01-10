@@ -9,6 +9,7 @@ This repository contains a web application designed to track gym workouts and bo
 - **Brutalist Design**: A focused, high-contrast interface designed for clarity and speed.
 - **Gym Logging**: Track exercises, sets, reps, and weights. The system automatically fetches your previous week's data for progressive overload.
 - **Bulk Tracker**: Weekly weight logging with automatic calculation of gained weight.
+- **AI Coach**: Export your workout data and automatically generate a prompt for Gemini AI to analyze your progressive overload and give nutrition advice.
 - **Google Sheets Integration**: All data is saved instantly to a private Google Sheet. The application handles table formatting and styling automatically.
 - **Mobile Responsive**: Fully optimized for mobile use with a custom navigation menu.
 - **Secure Access**: Simple password-based authentication to protect your logs.

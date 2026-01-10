@@ -1,144 +1,140 @@
 <template>
     <div
-        class="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden"
+        class="min-h-screen flex flex-col items-center justify-center bg-background p-4 relative overflow-hidden"
     >
         <div
-            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none select-none"
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 opacity-[0.03] pointer-events-none select-none"
         >
             <span class="text-[20rem] font-black font-sans text-primary"
-                >LOCK</span
+                >LOGIN</span
             >
         </div>
 
-        <div class="inner max-w-md w-full relative z-10">
-            <div
-                class="bg-white border-2 border-separator rounded-2xl p-8 md:p-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]"
-            >
-                <div class="text-center mb-10">
-                    <div
-                        class="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-full mb-6 group"
-                    >
-                        <Key
-                            class="w-10 h-10 text-primary group-hover:rotate-12 transition-transform duration-300"
-                            :stroke-width="2"
-                        />
-                    </div>
-
-                    <span
-                        class="font-handwriting text-xl text-primary mb-2 block -rotate-2"
-                    >
-                        Members Only
-                    </span>
-
-                    <h1
-                        class="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-foreground-primary mb-3 tracking-tight break-words"
-                    >
-                        Authentication
-                    </h1>
-                    <p
-                        class="text-sm text-foreground-text font-mono opacity-80"
-                    >
-                        Enter password to access gym logs
-                    </p>
-                </div>
-
-                <form @submit.prevent="handleLogin" class="space-y-8">
-                    <div class="group">
-                        <label
-                            class="block font-mono text-xs uppercase tracking-widest text-foreground-text mb-2 group-hover:text-primary transition-colors"
-                        >
-                            Password
-                        </label>
-                        <div class="relative">
-                            <input
-                                v-model="passwordInput"
-                                type="password"
-                                placeholder="••••••••"
-                                class="input-pow text-center tracking-widest text-2xl"
-                                autofocus
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div class="space-y-4">
-                        <button
-                            type="submit"
-                            :disabled="loading"
-                            class="w-full h-16 bg-foreground-primary text-white rounded-xl font-bold text-xl hover:bg-primary transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-70 disabled:hover:scale-100 flex items-center justify-center gap-2"
-                        >
-                            <span v-if="loading">Verifying...</span>
-                            <span v-else>Unlock Access</span>
-                            <ArrowRight v-if="!loading" class="w-5 h-5" />
-                        </button>
-
-                        <div
-                            v-if="error"
-                            class="p-3 bg-red-50 border border-red-100 rounded-lg text-red-500 text-sm text-center font-bold font-mono animate-pulse"
-                        >
-                            {{ error }}
-                        </div>
-                    </div>
-
-                    <div class="pt-6 border-t border-separator">
-                        <p
-                            class="text-[10px] text-foreground-text text-center font-mono uppercase tracking-widest opacity-60"
-                        >
-                            Session valid for 30 days
-                        </p>
-                    </div>
-                </form>
+        <div
+            class="w-full max-w-md bg-white border-2 border-separator p-8 md:p-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative z-10"
+        >
+            <div class="text-center mb-10">
+                <span
+                    class="font-handwriting text-xl text-primary mb-2 block -rotate-2"
+                    >Welcome Back!</span
+                >
+                <h1
+                    class="text-4xl font-black uppercase text-foreground-primary tracking-tighter"
+                >
+                    ACCESS LOGS
+                </h1>
             </div>
 
-            <div class="text-center mt-8">
-                <NuxtLink
-                    to="/"
-                    class="inline-flex items-center gap-2 text-sm text-foreground-text hover:text-primary font-mono uppercase tracking-wider font-bold transition-colors group"
+            <form @submit.prevent="handleLogin" class="space-y-6">
+                <div class="group">
+                    <label
+                        class="block font-mono text-xs uppercase tracking-widest text-foreground-text mb-2 group-focus-within:text-primary transition-colors"
+                    >
+                        Enter Password
+                    </label>
+                    <div class="relative">
+                        <input
+                            v-model="password"
+                            type="password"
+                            class="input-pow pr-12"
+                            placeholder="••••••••"
+                            required
+                            autofocus
+                        />
+                        <div
+                            class="absolute right-0 top-1/2 -translate-y-1/2 text-separator"
+                        >
+                            <Lock class="w-5 h-5" />
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    v-if="errorMsg"
+                    class="p-3 bg-red-50 border border-red-100 text-red-500 text-sm font-bold text-center rounded"
                 >
-                    <ArrowLeft
-                        class="w-4 h-4 group-hover:-translate-x-1 transition-transform"
-                    />
-                    Back to Home
-                </NuxtLink>
+                    {{ errorMsg }}
+                </div>
+
+                <button
+                    type="submit"
+                    :disabled="loading"
+                    class="w-full h-16 bg-foreground-primary text-white rounded-xl font-bold text-lg hover:bg-primary transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 uppercase tracking-wider group disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                    <span v-if="loading">Unlocking...</span>
+                    <span v-else class="flex items-center gap-2">
+                        Access Dashboard
+                        <ArrowRight
+                            class="w-5 h-5 group-hover:-rotate-45 transition-transform"
+                        />
+                    </span>
+                </button>
+            </form>
+
+            <div class="mt-12 pt-8 border-t border-separator text-center">
+                <p
+                    class="font-mono text-[10px] uppercase tracking-widest text-foreground-text mb-4 opacity-60"
+                >
+                    Not your app?
+                </p>
+
+                <div class="flex flex-col gap-4">
+                    <a
+                        href="https://github.com/szuryuu/bodylog"
+                        target="_blank"
+                        class="flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider text-foreground-primary hover:text-primary transition-colors group"
+                    >
+                        <Github class="w-4 h-4" />
+                        <span>Deploy Your Own</span>
+                        <ArrowUpRight
+                            class="w-3 h-3 text-separator group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
+                        />
+                    </a>
+
+                    <a
+                        :href="mailtoLink"
+                        class="flex items-center justify-center gap-2 text-xs font-mono text-foreground-text hover:text-primary transition-colors hover:underline underline-offset-4"
+                    >
+                        <Mail class="w-3 h-3" />
+                        <span>I want this app (Help me setup)</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { Key, ArrowRight, ArrowLeft } from "lucide-vue-next";
-const { login } = useAuth();
-const router = useRouter();
+import { ArrowRight, Lock, Github, ArrowUpRight, Mail } from "lucide-vue-next";
 
-const passwordInput = ref("");
+const { login } = useAuth();
+const password = ref("");
 const loading = ref(false);
-const error = ref("");
+const errorMsg = ref("");
+
+// Template Email
+const email = "ilham09dzaky@gmail.com";
+const subject = encodeURIComponent("Help setting up BodyLog");
+const body = encodeURIComponent(
+    "Hi Ilham,\n\nI found your BodyLog website and I'm interested in using it for my own training.\n\nI'm not a developer, so I don't know how to set it up. Can you help me deploy my own instance?\n\nThanks!",
+);
+const mailtoLink = `mailto:${email}?subject=${subject}&body=${body}`;
 
 async function handleLogin() {
     loading.value = true;
-    error.value = "";
+    errorMsg.value = "";
 
     try {
-        const response = await $fetch("/api/auth/verify", {
-            method: "POST",
-            headers: {
-                "X-App-Password": passwordInput.value,
-            },
-        });
-
-        login(passwordInput.value);
-        router.push("/gym");
-    } catch (e: any) {
-        error.value = "Invalid password";
+        const success = await login(password.value);
+        if (success) {
+            navigateTo("/");
+        } else {
+            errorMsg.value = "Invalid password. Access denied.";
+        }
+    } catch (e) {
+        errorMsg.value = "Login failed. Please try again.";
     } finally {
         loading.value = false;
     }
 }
-
-const { isAuthenticated } = useAuth();
-onMounted(() => {
-    if (isAuthenticated.value) {
-        router.push("/gym");
-    }
-});
 </script>

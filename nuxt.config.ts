@@ -8,10 +8,28 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: "V-Shape Tracker",
+      title: "BodyLog",
       meta: [
         { charset: "utf-8" },
-        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        {
+          name: "viewport",
+          content: "width=device-width, initial-scale=1, maximum-scale=1",
+        },
+        {
+          name: "description",
+          content: "Minimalist Gym & Weight Tracker with AI Coaching.",
+        },
+        { name: "theme-color", content: "#229799" },
+        { property: "og:title", content: "BodyLog - AI Powered Gym Tracker" },
+        {
+          property: "og:description",
+          content:
+            "Track workouts, monitor bulk progress, and get AI analysis.",
+        },
+      ],
+      link: [
+        { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+        { rel: "apple-touch-icon", href: "/favicon.svg" },
       ],
     },
   },
