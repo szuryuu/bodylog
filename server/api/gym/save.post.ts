@@ -1,6 +1,8 @@
 import type { GymSession } from "~/types";
 
 export default defineEventHandler(async (event) => {
+    requireAuth(event); 
+
     try {
         const body = await readBody<GymSession>(event);
         const sheets = await getGoogleSheetsClient();
