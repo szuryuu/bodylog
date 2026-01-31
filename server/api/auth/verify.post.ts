@@ -1,8 +1,10 @@
-export default defineEventHandler((event) => {
-  const password = getRequestHeader(event, "X-App-Password");
+export default defineEventHandler(async (event) => {
+  const body = await readBody(event);
+  const password = body?.password;
+  
   const validPassword = useRuntimeConfig().appPassword;
 
-  if (password !== validPassword) {
+  if (!password || String(password) !== String(validPassword)) {
     throw createError({
       statusCode: 401,
       message: "Invalid password",
