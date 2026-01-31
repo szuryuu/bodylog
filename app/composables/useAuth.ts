@@ -5,7 +5,6 @@ export const useAuth = () => {
         sameSite: 'lax'
     });
 
-    // Check Status
     const checkAuth = () => {
         if (authCookie.value) {
             isAuthenticated.value = true;
@@ -16,9 +15,10 @@ export const useAuth = () => {
         try {
             const response = await $fetch('/api/auth/verify', {
                 method: 'POST',
-                body: { password }
+                body: { password: password } 
             });
 
+            // @ts-ignore
             if (response.success) {
                 isAuthenticated.value = true;
                 authCookie.value = 'logged_in'; 
@@ -39,12 +39,10 @@ export const useAuth = () => {
         navigateTo('/login');
     };
 
-    // Helper
     const secureFetch = async (url: string, options: any = {}) => {
         if (!isAuthenticated.value) {
             throw createError({ statusCode: 401, message: "Unauthorized" });
         }
-        
         return await $fetch(url, {
             ...options,
             headers: {

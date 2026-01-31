@@ -4,6 +4,8 @@ export default defineEventHandler(async (event) => {
   
   const validPassword = useRuntimeConfig().appPassword;
 
+  // console.log("Login Attempt:", { input: password, config: validPassword });
+
   if (!password || String(password) !== String(validPassword)) {
     throw createError({
       statusCode: 401,
