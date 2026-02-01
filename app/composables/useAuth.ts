@@ -5,11 +5,18 @@ export const useAuth = () => {
         sameSite: 'lax'
     });
 
+    // Auto-check auth on composable initialization (client-side only)
     const checkAuth = () => {
-        if (authCookie.value) {
+        if (authCookie.value === 'logged_in') {
             isAuthenticated.value = true;
+        } else {
+            isAuthenticated.value = false;
         }
     };
+    
+    if (process.client) {
+        checkAuth();
+    }
 
     const login = async (password: string): Promise<boolean> => {
         try {
@@ -20,8 +27,11 @@ export const useAuth = () => {
 
             // @ts-ignore
             if (response.success) {
+                authCookie.value = 'logged_in';
+                
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
                 isAuthenticated.value = true;
-                authCookie.value = 'logged_in'; 
                 return true;
             }
             return false;
@@ -43,13 +53,7 @@ export const useAuth = () => {
         if (!isAuthenticated.value) {
             throw createError({ statusCode: 401, message: "Unauthorized" });
         }
-        return await $fetch(url, {
-            ...options,
-            headers: {
-                ...options.headers,
-                'x-auth-token': authCookie.value || ''
-            }
-        });
+        return await $fetch(url, options);
     };
 
     return {

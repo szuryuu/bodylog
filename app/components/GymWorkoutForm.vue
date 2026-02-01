@@ -155,8 +155,8 @@
                         
                         <div class="bg-green-50 p-3 rounded border border-green-100">
                             <div class="font-bold text-green-800 mb-1">Barbell / Smith</div>
-                            <p>Catat <strong>TOTAL BERAT</strong> (Plate + Bar).</p>
-                            <p class="text-xs text-green-600 mt-1">Ex: Plate 10kg kiri/kanan + Bar 20kg -> Tulis <strong>40</strong>.</p>
+                            <p>Catat <strong>TOTAL BERAT</strong> (Plate).</p>
+                            <p class="text-xs text-green-600 mt-1">Ex: Plate 10kg kiri/kanan -> Tulis <strong>20</strong>.</p>
                         </div>
 
                         <div class="bg-orange-50 p-3 rounded border border-orange-100">

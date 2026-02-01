@@ -23,6 +23,7 @@
                             :type="showPassword ? 'text' : 'password'"
                             class="input-pow pr-12"
                             placeholder="••••••••"
+                            :disabled="loading"
                             required
                             autofocus
                         />
@@ -31,6 +32,7 @@
                             type="button"
                             @click="showPassword = !showPassword"
                             class="absolute right-3 top-1/2 -translate-y-1/2 text-separator hover:text-primary transition-colors focus:outline-none"
+                            :disabled="loading"
                         >
                             <EyeOff v-if="showPassword" class="w-5 h-5" />
                             <Eye v-else class="w-5 h-5" />
@@ -45,9 +47,16 @@
                 <button
                     type="submit"
                     :disabled="loading"
-                    class="w-full h-16 bg-foreground-primary text-white rounded-xl font-bold text-lg hover:bg-primary transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 uppercase tracking-wider group disabled:opacity-70 disabled:cursor-not-allowed"
+                    class="w-full h-16 bg-foreground-primary text-white rounded-xl font-bold text-lg hover:bg-primary transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 uppercase tracking-wider group disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
-                    <span v-if="loading">Unlocking...</span>
+                    <span v-if="loading" class="flex items-center gap-3">
+                        <div class="flex gap-1">
+                            <span class="w-2 h-2 bg-white rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+                            <span class="w-2 h-2 bg-white rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+                            <span class="w-2 h-2 bg-white rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+                        </div>
+                        <span>Unlocking...</span>
+                    </span>
                     <span v-else class="flex items-center gap-2">
                         Access Dashboard
                         <ArrowRight class="w-5 h-5 group-hover:-rotate-45 transition-transform" />
@@ -81,15 +90,38 @@
                 </div>
             </div>
         </div>
+
+        <!-- Success Animation -->
+        <transition name="fade">
+            <div v-if="showSuccess" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                <div class="w-full max-w-sm bg-white border-2 border-foreground-primary p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-center animate-bounce-in">
+                    <div class="mx-auto w-16 h-16 bg-green-50 border-2 border-green-100 rounded-full flex items-center justify-center mb-6">
+                        <CheckCircle class="w-8 h-8 text-green-600" />
+                    </div>
+                    <h3 class="text-3xl font-black uppercase mb-2">
+                        Access Granted!
+                    </h3>
+                    <p class="font-mono text-sm mb-4 text-foreground-text">
+                        Loading your workout data...
+                    </p>
+                    <div class="flex gap-1 justify-center">
+                        <span class="w-2 h-2 bg-primary rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+                        <span class="w-2 h-2 bg-primary rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+                        <span class="w-2 h-2 bg-primary rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+                    </div>
+                </div>
+            </div>
+        </transition>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ArrowRight, Github, ArrowUpRight, Mail, Eye, EyeOff } from "lucide-vue-next";
+import { ArrowRight, Github, ArrowUpRight, Mail, Eye, EyeOff, CheckCircle } from "lucide-vue-next";
 
 const { login } = useAuth();
 const password = ref("");
 const loading = ref(false);
+const showSuccess = ref(false);
 const errorMsg = ref("");
 const showPassword = ref(false); 
 
@@ -107,14 +139,40 @@ async function handleLogin() {
     try {
         const success = await login(password.value);
         if (success) {
-            navigateTo("/");
+            // Show success animation
+            showSuccess.value = true;
+            
+            // Wait a bit for visual feedback
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Navigate to gym page
+            navigateTo("/gym");
         } else {
             errorMsg.value = "Invalid password. Access denied.";
         }
     } catch (e) {
         errorMsg.value = "Login failed. Please try again.";
     } finally {
-        loading.value = false;
+        if (!showSuccess.value) {
+            loading.value = false;
+        }
     }
 }
 </script>
+
+<style scoped>
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 0.2s ease;
+}
+.fade-enter-from, .fade-leave-to {
+    opacity: 0;
+}
+@keyframes bounceIn {
+    0% { transform: scale(0.9); opacity: 0; }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+}
+.animate-bounce-in {
+    animation: bounceIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+</style>

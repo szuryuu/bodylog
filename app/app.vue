@@ -226,7 +226,7 @@
 
 <script setup lang="ts">
 import { Menu, X, LogOut } from "lucide-vue-next";
-const { isAuthenticated, logout } = useAuth();
+const { isAuthenticated, logout, checkAuth } = useAuth();
 
 const isMenuOpen = ref(false);
 const showLogoutModal = ref(false);
@@ -241,6 +241,11 @@ function confirmLogout() {
     showLogoutModal.value = false;
     navigateTo("/");
 }
+
+// Check auth on mount
+onMounted(() => {
+    checkAuth();
+});
 </script>
 
 <style scoped>
