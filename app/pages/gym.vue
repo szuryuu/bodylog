@@ -36,6 +36,25 @@
 
         <!-- Actual Content -->
         <div v-else>
+            <!-- Guest Preview Banner -->
+            <div v-if="!isAuthenticated" class="inner border-x border-b-2 border-yellow-400 bg-yellow-50 px-6 py-4">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <Eye class="w-5 h-5 text-yellow-600 shrink-0" />
+                        <div>
+                            <p class="font-bold text-yellow-900 text-sm">PREVIEW MODE</p>
+                            <p class="text-xs text-yellow-700 font-mono">Login to save your workouts & track progress</p>
+                        </div>
+                    </div>
+                    <NuxtLink 
+                        to="/login" 
+                        class="px-6 py-2 bg-yellow-600 text-white font-bold text-xs uppercase rounded hover:bg-yellow-700 transition-colors whitespace-nowrap"
+                    >
+                        Login Now →
+                    </NuxtLink>
+                </div>
+            </div>
+
             <div class="inner border-x bg-[#fcfbf7] py-16 md:py-24 border-b border-separator text-center">
                 <div class="flex justify-center mb-4">
                     <Dumbbell class="w-12 h-12 text-primary rotate-[-15deg]" :stroke-width="1.5" />
@@ -110,7 +129,7 @@
                 </div>
 
                 <div
-                    v-if="weekCompletionStatus"
+                    v-if="weekCompletionStatus && isAuthenticated"
                     class="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-white border border-separator rounded-full"
                 >
                     <span class="font-mono text-xs text-foreground-text">
@@ -124,7 +143,7 @@
 
             <div class="inner border-x border-separator bg-white">
                 <div
-                    v-if="isDayCompleted(selectedDay)"
+                    v-if="isDayCompleted(selectedDay) && isAuthenticated"
                     class="px-6 py-3 bg-green-50 border-b border-green-100 flex items-center justify-between"
                 >
                     <div class="flex items-center gap-2">
@@ -201,12 +220,20 @@
                         class="flex flex-col items-center justify-center py-16 border border-dashed border-separator rounded-xl bg-[#fcfbf7]"
                     >
                         <Dumbbell class="w-12 h-12 text-separator mb-4 opacity-50" />
-                        <p class="font-mono text-sm text-foreground-text opacity-60">
-                            No workouts logged yet.
+                        <p class="font-mono text-sm text-foreground-text opacity-60 mb-4">
+                            {{ isAuthenticated ? 'No workouts logged yet.' : 'Login to see your workout history.' }}
                         </p>
                         <button
+                            v-if="!isAuthenticated"
+                            @click="navigateTo('/login')"
+                            class="px-6 py-2 bg-primary text-white rounded-lg text-sm font-bold uppercase hover:bg-foreground-primary transition-colors"
+                        >
+                            Login to Start
+                        </button>
+                        <button
+                            v-else
                             @click="initializeProgram"
-                            class="mt-4 px-6 py-2 bg-primary text-white rounded-lg text-sm font-bold uppercase hover:bg-foreground-primary transition-colors"
+                            class="px-6 py-2 bg-primary text-white rounded-lg text-sm font-bold uppercase hover:bg-foreground-primary transition-colors"
                         >
                             Start Week 1
                         </button>
@@ -225,6 +252,7 @@ import {
     History,
     Calendar,
     CheckCircle2,
+    Eye,
 } from "lucide-vue-next";
 
 const PROGRAM_START_DATE = new Date("2026-01-12");
@@ -376,26 +404,20 @@ watch(currentWeek, () => {
 onMounted(async () => {
     isLoading.value = true;
     
-    // Ensure auth is checked
+    // Check auth state
     checkAuth();
-    
-    // Wait a tick for state to update
     await nextTick();
-    
-    if (!isAuthenticated.value) {
-        navigateTo('/login');
-        return;
-    }
     
     currentWeek.value = calculatedWeek.value;
     
     try {
-        await loadHistory();
+        if (isAuthenticated.value) {
+            await loadHistory();
+        }
         initializeProgram();
     } catch (error) {
         console.error("Error loading gym data:", error);
     } finally {
-        // Minimum loading time for smooth UX
         setTimeout(() => {
             isLoading.value = false;
         }, 500);

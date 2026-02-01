@@ -36,6 +36,25 @@
 
         <!-- Actual Content -->
         <div v-else>
+            <!-- Guest Preview Banner -->
+            <div v-if="!isAuthenticated" class="inner border-x border-b-2 border-yellow-400 bg-yellow-50 px-6 py-4">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <Eye class="w-5 h-5 text-yellow-600 shrink-0" />
+                        <div>
+                            <p class="font-bold text-yellow-900 text-sm">PREVIEW MODE</p>
+                            <p class="text-xs text-yellow-700 font-mono">Login to save your weight & track bulk progress</p>
+                        </div>
+                    </div>
+                    <NuxtLink 
+                        to="/login" 
+                        class="px-6 py-2 bg-yellow-600 text-white font-bold text-xs uppercase rounded hover:bg-yellow-700 transition-colors whitespace-nowrap"
+                    >
+                        Login Now →
+                    </NuxtLink>
+                </div>
+            </div>
+
             <div class="inner border-x bg-white py-16 md:py-24 border-b border-separator relative overflow-hidden">
                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none">
                     <span class="text-[15rem] font-black font-sans">BULK</span>
@@ -101,7 +120,7 @@
                     </div>
 
                     <div v-else class="text-center py-8 opacity-50 italic">
-                        No data logged yet.
+                        {{ isAuthenticated ? 'No data logged yet.' : 'Login to see your weight history.' }}
                     </div>
                 </div>
             </div>
@@ -112,6 +131,8 @@
 </template>
 
 <script setup lang="ts">
+import { Eye } from "lucide-vue-next";
+
 const { secureFetch, checkAuth, isAuthenticated } = useAuth();
 
 const isLoading = ref(true);
@@ -150,21 +171,17 @@ function handleSaved() {
 onMounted(async () => {
     isLoading.value = true;
     
-    // Ensure auth is checked
+    // Check auth state
     checkAuth();
     await nextTick();
     
-    if (!isAuthenticated.value) {
-        navigateTo('/login');
-        return;
-    }
-    
     try {
-        await loadWeightData();
+        if (isAuthenticated.value) {
+            await loadWeightData();
+        }
     } catch (error) {
         console.error("Error loading bulk data:", error);
     } finally {
-        // Minimum loading time
         setTimeout(() => {
             isLoading.value = false;
         }, 500);
